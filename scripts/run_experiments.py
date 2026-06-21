@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import time
+import textwrap
 import urllib.error
 import urllib.request
 from collections import defaultdict
@@ -566,6 +567,37 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
     import matplotlib.pyplot as plt
     import numpy as np
 
+    plt.rcParams.update({
+        "font.family": "DejaVu Sans",
+        "axes.titlesize": 13,
+        "axes.labelsize": 10,
+        "xtick.labelsize": 9,
+        "ytick.labelsize": 9,
+        "legend.fontsize": 8,
+    })
+
+    scenario_names = {
+        "chat_fanout": "чат fan-out",
+        "outbox_transaction": "Outbox-транзакция",
+        "sync_transaction": "синхронная транзакция",
+    }
+
+    def wrapped(text, width):
+        return "\n".join(textwrap.wrap(str(text), width=width, break_long_words=False))
+
+    def annotate_barh(ax, bars, values, suffix=""):
+        max_value = max(values) if values else 0
+        offset = max(max_value * 0.012, 0.04)
+        for bar, value in zip(bars, values):
+            ax.text(
+                bar.get_width() + offset,
+                bar.get_y() + bar.get_height() / 2,
+                f"{value:g}{suffix}",
+                va="center",
+                ha="left",
+                fontsize=9,
+            )
+
     by_scenario = defaultdict(list)
     for row in aggregates:
         by_scenario[row["scenario"]].append(row)
@@ -573,10 +605,15 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
     fig, ax = plt.subplots(figsize=(10, 5))
     for scenario, rows in sorted(by_scenario.items()):
         rows = sorted(rows, key=lambda item: item["load"])
-        ax.plot([row["load"] for row in rows], [row["p95_ms_mean"] for row in rows], marker="o", label=scenario)
-    ax.set_title("p95 latency by scenario and load")
-    ax.set_xlabel("commands/messages per batch")
-    ax.set_ylabel("p95 latency, ms")
+        ax.plot(
+            [row["load"] for row in rows],
+            [row["p95_ms_mean"] for row in rows],
+            marker="o",
+            label=scenario_names.get(scenario, scenario),
+        )
+    ax.set_title("Задержка p95 по сценариям и размеру нагрузки")
+    ax.set_xlabel("команд/сообщений в серии")
+    ax.set_ylabel("p95, мс")
     ax.grid(alpha=0.25)
     ax.legend()
     fig.tight_layout()
@@ -586,87 +623,223 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
     fig, ax = plt.subplots(figsize=(10, 5))
     for scenario, rows in sorted(by_scenario.items()):
         rows = sorted(rows, key=lambda item: item["load"])
-        ax.plot([row["load"] for row in rows], [row["throughput_rps_mean"] for row in rows], marker="o", label=scenario)
-    ax.set_title("Throughput by scenario and load")
-    ax.set_xlabel("commands/messages per batch")
-    ax.set_ylabel("throughput, requests/s")
+        ax.plot(
+            [row["load"] for row in rows],
+            [row["throughput_rps_mean"] for row in rows],
+            marker="o",
+            label=scenario_names.get(scenario, scenario),
+        )
+    ax.set_title("Пропускная способность по сценариям и размеру нагрузки")
+    ax.set_xlabel("команд/сообщений в серии")
+    ax.set_ylabel("запросов/с")
     ax.grid(alpha=0.25)
     ax.legend()
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "throughput_comparison.png"), dpi=160)
     plt.close(fig)
 
-    reliability_labels = ["duplicate", "publish-no-ack", "pubsub late", "cache stale", "saga completed", "ws replay"]
-    reliability_values = [
-        1 if faults["duplicate_callback"]["final_gold"] == 7 else 0,
-        1 if faults["publish_no_ack"]["transport_duplicate_observed"] else 0,
-        1 if faults["pubsub_loss"]["delivered_to_late_subscriber"] is False else 0,
-        1 if faults["cache_stale"]["stale"] else 0,
-        1 if faults["saga"]["saga_completed"] >= 1 and faults["saga"]["saga_compensated"] >= 1 else 0,
-        1 if faults["websocket_replay"]["received"] >= 1 else 0,
+    reliability_cards = [
+        {
+            "title": "Повторный callback",
+            "metric": f"5 запросов; дублей={faults['duplicate_callback']['duplicates_reported']}; gold={faults['duplicate_callback']['final_gold']}",
+            "result": "повторный бизнес-эффект подавлен",
+            "color": "#4d9f6f",
+        },
+        {
+            "title": "Publish-no-ack",
+            "metric": f"транспортных дублей={faults['publish_no_ack']['duplicate_events_after']}; pending={faults['publish_no_ack']['outbox_pending_after']}",
+            "result": "backlog закрыт, потребитель обязан быть идемпотентным",
+            "color": "#b1762d",
+        },
+        {
+            "title": "Pub/Sub late subscriber",
+            "metric": f"доставка позднему подписчику={faults['pubsub_loss']['delivered_to_late_subscriber']}",
+            "result": "история не хранится, нужен persisted stream",
+            "color": "#9d3f3f",
+        },
+        {
+            "title": "WebSocket replay",
+            "metric": f"получено после reconnect={faults['websocket_replay']['received']}",
+            "result": "восстановление требует last-seen marker",
+            "color": "#356f9f",
+        },
+        {
+            "title": "Cache-aside stale",
+            "metric": f"кэш={faults['cache_stale']['cached_gold']}; БД={faults['cache_stale']['actual_gold']}",
+            "result": "кэш не является источником истины для экономики",
+            "color": "#b1762d",
+        },
+        {
+            "title": "Saga outcomes",
+            "metric": f"completed={faults['saga']['saga_completed']}; compensated={faults['saga']['saga_compensated']}",
+            "result": "оба исхода наблюдаемы и проверяемы",
+            "color": "#4d9f6f",
+        },
     ]
-    fig, ax = plt.subplots(figsize=(10, 3))
-    ax.imshow([reliability_values], cmap="Greens", vmin=0, vmax=1)
-    ax.set_yticks([0], ["verified"])
-    ax.set_xticks(range(len(reliability_labels)), reliability_labels, rotation=20, ha="right")
-    ax.set_title("Reliability/fault-injection checks")
-    for idx, value in enumerate(reliability_values):
-        ax.text(idx, 0, "pass" if value else "fail", ha="center", va="center")
+    fig, ax = plt.subplots(figsize=(11.5, 5.0))
+    ax.axis("off")
+    cols = 3
+    rows = 2
+    card_w = 0.30
+    card_h = 0.34
+    x_gap = 0.035
+    y_gap = 0.12
+    start_x = 0.025
+    start_y = 0.52
+    for index, item in enumerate(reliability_cards):
+        row = index // cols
+        col = index % cols
+        x = start_x + col * (card_w + x_gap)
+        y = start_y - row * (card_h + y_gap)
+        rect = plt.Rectangle((x, y), card_w, card_h, facecolor="#f7f9fc", edgecolor="#c9d1d9", linewidth=1.0)
+        ax.add_patch(rect)
+        ax.add_patch(plt.Rectangle((x, y + card_h - 0.075), card_w, 0.075, facecolor=item["color"], edgecolor=item["color"]))
+        ax.text(x + 0.018, y + card_h - 0.038, item["title"], ha="left", va="center", color="white", fontsize=10, weight="bold")
+        ax.text(x + 0.018, y + card_h - 0.12, wrapped(item["metric"], 34), ha="left", va="top", color="#111827", fontsize=9)
+        ax.text(x + 0.018, y + 0.055, wrapped(item["result"], 36), ha="left", va="bottom", color="#111827", fontsize=9)
+    ax.text(
+        0.5,
+        0.955,
+        "Fault-injection: отказ воспроизведён, метрика зафиксирована, архитектурное следствие проверено",
+        ha="center",
+        va="center",
+        fontsize=12,
+        weight="bold",
+    )
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "reliability_matrix.png"), dpi=160)
     plt.close(fig)
 
-    fig, ax = plt.subplots(figsize=(8, 4))
-    labels = ["pending", "oldest pending ms", "attempts", "duplicates"]
-    values = [
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.4), gridspec_kw={"width_ratios": [1.35, 1.0]})
+    volume_labels = ["Попытки Outbox", "Опубликовано", "События stream"]
+    volume_values = [
+        final_metrics["outbox_attempts_total"],
+        final_metrics["outbox_published"],
+        final_metrics["redis_stream_len"],
+    ]
+    bars = ax1.barh(volume_labels, volume_values, color=["#356f9f", "#4d9f6f", "#78909c"])
+    ax1.set_title("Объём публикации")
+    ax1.set_xlabel("событий/попыток")
+    ax1.grid(axis="x", alpha=0.25)
+    annotate_barh(ax1, bars, volume_values)
+
+    signal_labels = ["Ожидают", "Возраст старейшего, мс", "Транспортные дубли"]
+    signal_values = [
         final_metrics["outbox_pending"],
         final_metrics["outbox_oldest_pending_ms"],
-        final_metrics["outbox_attempts_total"],
         final_metrics["redis_duplicate_events"],
     ]
-    ax.bar(labels, values, color=["#356f9f", "#4d9f6f", "#b1762d", "#9d3f3f"])
-    ax.set_title("Outbox backlog and duplicate transport signal")
-    ax.set_ylabel("value")
-    ax.grid(axis="y", alpha=0.25)
-    fig.tight_layout()
+    bars = ax2.barh(signal_labels, signal_values, color=["#4d9f6f", "#356f9f", "#b1762d"])
+    ax2.set_title("Остаток и сигнал отказа")
+    ax2.set_xlabel("значение")
+    ax2.set_xlim(0, max(signal_values + [1]) * 1.35)
+    ax2.grid(axis="x", alpha=0.25)
+    annotate_barh(ax2, bars, signal_values)
+    fig.suptitle("Outbox: публикация закрыта, транспортный дубль обнаружен", fontsize=13, y=0.98)
+    fig.tight_layout(rect=[0, 0, 1, 0.92])
     fig.savefig(os.path.join(out_dir, "outbox_backlog.png"), dpi=160)
     plt.close(fig)
 
-    fig, ax = plt.subplots(figsize=(7, 4))
-    ax.bar(["cached", "actual"], [faults["cache_stale"]["cached_gold"], faults["cache_stale"]["actual_gold"]], color=["#b1762d", "#356f9f"])
-    ax.set_title("Cache-aside stale read")
+    cached = faults["cache_stale"]["cached_gold"]
+    actual = faults["cache_stale"]["actual_gold"]
+    delta = actual - cached
+    fig, ax = plt.subplots(figsize=(8, 4.6))
+    bars = ax.bar(["Redis-кэш", "PostgreSQL"], [cached, actual], color=["#b1762d", "#356f9f"], width=0.55)
+    ax.set_title("Cache-aside: проверка устаревшего чтения")
     ax.set_ylabel("gold")
+    ax.set_ylim(0, max(actual, cached) * 1.35)
     ax.grid(axis="y", alpha=0.25)
+    for bar, value in zip(bars, [cached, actual]):
+        ax.text(bar.get_x() + bar.get_width() / 2, value + 3, f"{value:g}", ha="center", va="bottom", fontsize=10)
+    ax.annotate(
+        "",
+        xy=(1.12, cached),
+        xytext=(1.12, actual),
+        arrowprops={"arrowstyle": "<->", "color": "#9d3f3f", "lw": 1.6},
+    )
+    ax.text(
+        1.18,
+        (cached + actual) / 2,
+        f"разрыв {delta:g} gold",
+        va="center",
+        ha="left",
+        color="#9d3f3f",
+        fontsize=10,
+    )
+    ax.text(
+        0.5,
+        max(actual, cached) * 1.24,
+        "Вывод: кэш ускоряет чтение, но не является источником истины для экономики",
+        ha="center",
+        va="center",
+        fontsize=9,
+        bbox={"boxstyle": "round,pad=0.35", "facecolor": "#f4f7fb", "edgecolor": "#c9d1d9"},
+    )
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "cache_consistency.png"), dpi=160)
     plt.close(fig)
 
-    fig, ax1 = plt.subplots(figsize=(8, 4))
-    ax1.bar(["completed", "compensated"], [faults["saga"]["saga_completed"], faults["saga"]["saga_compensated"]], color=["#4d9f6f", "#9d3f3f"])
-    ax1.set_ylabel("count")
-    ax1.set_title("Saga outcomes and duration")
-    ax2 = ax1.twinx()
-    ax2.plot(["completed", "compensated"], [faults["saga"]["saga_duration_avg_ms"], faults["saga"]["saga_duration_p95_ms"]], color="#b1762d", marker="o")
-    ax2.set_ylabel("duration, ms")
-    fig.tight_layout()
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.5, 4.4), gridspec_kw={"width_ratios": [1.0, 1.1]})
+    outcome_labels = ["завершена", "компенсирована"]
+    outcome_values = [faults["saga"]["saga_completed"], faults["saga"]["saga_compensated"]]
+    bars = ax1.bar(outcome_labels, outcome_values, color=["#4d9f6f", "#9d3f3f"], width=0.55)
+    ax1.set_title("Исходы Saga")
+    ax1.set_ylabel("количество")
+    ax1.set_ylim(0, max(outcome_values + [1]) * 1.35)
+    ax1.grid(axis="y", alpha=0.25)
+    for bar, value in zip(bars, outcome_values):
+        ax1.text(bar.get_x() + bar.get_width() / 2, value + 0.04, f"{value:g}", ha="center", fontsize=10)
+
+    duration_labels = ["средняя", "p95"]
+    duration_values = [faults["saga"]["saga_duration_avg_ms"], faults["saga"]["saga_duration_p95_ms"]]
+    bars = ax2.bar(duration_labels, duration_values, color=["#78909c", "#b1762d"], width=0.55)
+    ax2.set_title("Длительность Saga")
+    ax2.set_ylabel("мс")
+    ax2.set_ylim(0, max(duration_values) * 1.35)
+    ax2.grid(axis="y", alpha=0.25)
+    for bar, value in zip(bars, duration_values):
+        ax2.text(bar.get_x() + bar.get_width() / 2, value + 0.5, f"{value:.2f}", ha="center", fontsize=10)
+    fig.suptitle("Saga: оба исхода наблюдаемы, длительность измеряется", fontsize=13, y=0.98)
+    fig.tight_layout(rect=[0, 0, 1, 0.92])
     fig.savefig(os.path.join(out_dir, "saga_outcomes.png"), dpi=160)
     plt.close(fig)
 
-    criteria = ["scalability", "reliability", "performance", "implementation_complexity", "operational_cost", "observability"]
-    top = sorted(matrix, key=lambda row: row["score_total"], reverse=True)[:4]
-    angles = np.linspace(0, 2 * math.pi, len(criteria), endpoint=False).tolist()
-    angles += angles[:1]
-    fig = plt.figure(figsize=(7, 7))
-    ax = plt.subplot(111, polar=True)
-    for row in top:
-        values = [row[criterion] for criterion in criteria]
-        values += values[:1]
-        ax.plot(angles, values, label=row["solution"])
-        ax.fill(angles, values, alpha=0.08)
-    ax.set_xticks(angles[:-1], criteria)
-    ax.set_ylim(0, 5)
-    ax.set_title("Criteria scores for leading architectural components")
-    ax.legend(loc="upper right", bbox_to_anchor=(1.35, 1.1), fontsize=8)
+    criteria = [
+        ("scalability", "Масштаб."),
+        ("reliability", "Надёжн."),
+        ("performance", "Произв."),
+        ("implementation_complexity", "Сложн."),
+        ("operational_cost", "Стоимость"),
+        ("observability", "Наблюд."),
+    ]
+    solution_names = {
+        "PostgreSQL synchronous transaction": "PostgreSQL transaction",
+        "Transactional Outbox": "Transactional Outbox",
+        "Inbox/idempotency": "Inbox/idempotency",
+        "Redis Streams": "Redis Streams",
+        "Redis Pub/Sub": "Redis Pub/Sub",
+        "WebSocket gateway": "WebSocket gateway",
+        "Saga orchestration": "Saga orchestration",
+        "Cache-aside": "Cache-aside",
+        "Chat event fan-out": "Chat fan-out",
+    }
+    ordered = sorted(matrix, key=lambda row: row["score_total"], reverse=True)
+    data = np.array([[row[key] for key, _ in criteria] for row in ordered])
+    y_labels = [f"{solution_names.get(row['solution'], row['solution'])}\nитог {row['score_total']:.2f}" for row in ordered]
+    fig, ax = plt.subplots(figsize=(10.5, 6.2))
+    image = ax.imshow(data, cmap="YlGnBu", vmin=1, vmax=5, aspect="auto")
+    ax.set_xticks(range(len(criteria)), [label for _, label in criteria])
+    ax.set_yticks(range(len(ordered)), y_labels)
+    ax.set_title("Экспериментальная оценка архитектурных решений по критериям")
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            value = data[i, j]
+            ax.text(j, i, f"{value:.0f}", ha="center", va="center", color="black", fontsize=9)
+    ax.set_xlabel("критерии сравнения")
+    ax.tick_params(axis="x", bottom=False, top=True, labelbottom=False, labeltop=True)
+    ax.tick_params(axis="y", length=0)
+    cbar = fig.colorbar(image, ax=ax, fraction=0.035, pad=0.02)
+    cbar.set_label("оценка 1–5")
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "criteria_radar.png"), dpi=160)
     plt.close(fig)

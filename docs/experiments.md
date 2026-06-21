@@ -40,7 +40,7 @@ make verify-results
 | `evidence_trace.json` | Цепочка `критерий -> сценарий -> метрика -> артефакт -> результат -> вывод`. |
 | `recommendations.json` | Практические рекомендации с указанием доказательства. |
 
-Графики: `latency_comparison.png`, `throughput_comparison.png`, `reliability_matrix.png`, `outbox_backlog.png`, `cache_consistency.png`, `saga_outcomes.png`, `criteria_radar.png`.
+Графики: `latency_comparison.png`, `throughput_comparison.png`, `reliability_matrix.png`, `outbox_backlog.png`, `cache_consistency.png`, `saga_outcomes.png`, `criteria_radar.png` (тепловая карта критериев).
 
 ## Проверка результатов
 

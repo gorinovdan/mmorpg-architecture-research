@@ -66,7 +66,7 @@ make down
 - `outbox_backlog.png`;
 - `cache_consistency.png`;
 - `saga_outcomes.png`;
-- `criteria_radar.png`;
+- `criteria_radar.png` — тепловая карта оценок по критериям;
 - `metrics_plot.png`.
 
 ## Наблюдаемые метрики
