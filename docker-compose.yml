@@ -56,7 +56,7 @@ services:
     working_dir: /workspace
     volumes:
       - .:/workspace
-    command: ["python3", "scripts/run_experiments.py", "--base-url", "http://backend:8080", "--ws-url", "ws://backend:8080/ws?last=0-0", "--out-dir", "results/latest"]
+    command: ["sh", "-c", "python3 -m pip install -r requirements.txt && python3 scripts/run_experiments.py --base-url http://backend:8080 --ws-url 'ws://backend:8080/ws?last=0-0' --out-dir results/latest"]
     depends_on:
       backend:
         condition: service_started

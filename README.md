@@ -1,65 +1,121 @@
 # MMORPG Architecture Research Stand
 
-Практический стенд для проверки архитектурных решений, применимых к серверной части MMORPG: синхронная транзакционная обработка, Outbox/Inbox, Redis Pub/Sub, Redis Streams, WebSocket replay/reconnect, saga-оркестрация и cache-aside.
+Исследовательский стенд проверяет архитектурные решения серверной платформы текстовой MMORPG: PostgreSQL как source of truth, Inbox/Outbox, Redis Streams/Pub/Sub, WebSocket replay, Saga orchestration и cache-aside. Репозиторий предназначен для воспроизводимого запуска экспериментов, результаты которых используются в отчете НИР.
 
-Репозиторий используется как воспроизводимое приложение к НИР:
-
-```text
-https://github.com/gorinovdan/mmorpg-architecture-research
-```
+Публичный URL: <https://github.com/gorinovdan/mmorpg-architecture-research>
 
 ## Состав стенда
 
-- `cmd/researchd` — HTTP/WebSocket backend и worker.
-- `cmd/wscheck` — проверка доставки WebSocket-событий после reconnect/replay.
-- `internal/expstats` — проверяемые функции расчета экспериментальных метрик.
-- `scripts/run_experiments.py` — нагрузочные и отказоустойчивые сценарии.
-- `scripts/verify_results.py` — автоматическая проверка инвариантов результатов.
-- `docker-compose.yml` — PostgreSQL, Redis, backend, worker и профиль load generator.
-
-## Проверяемые решения
-
-| Решение | Что проверяется |
+| Компонент | Назначение |
 | --- | --- |
-| Синхронная транзакция | Задержка команды и сохранение состояния в PostgreSQL как source of truth. |
-| Inbox | Идемпотентность callback при повторной доставке одной команды. |
-| Outbox | Сохранение бизнес-события в одной транзакции с изменением состояния. |
-| Redis Pub/Sub | Эфемерная доставка и потеря сообщения для позднего подписчика. |
-| Redis Streams | Durable replay событий и обнаружение транспортного дубля. |
-| WebSocket reconnect | Повторное чтение событий из Redis Streams после подключения клиента. |
-| Saga | Завершение успешной покупки и компенсация невыполнимого сценария. |
-| Cache-aside | Обнаружение устаревшего значения при изменении PostgreSQL в обход инвалидации. |
+| Go backend | HTTP API, WebSocket gateway, обработка команд, чат, Saga worker, административные сценарии эксперимента. |
+| PostgreSQL | Источник истины для состояния игроков, Inbox, Outbox, чата и состояний Saga. |
+| Redis Streams | Durable event log для replay, учета дублей и восстановления WebSocket-клиента после reconnect. |
+| Redis Pub/Sub | Низколатентный transient-канал для live fan-out активным клиентам. |
+| Python runner | Серии нагрузки, fault-injection, CSV/JSON-артефакты и графики. |
+| GitHub Actions | Go-тесты, Docker smoke test, генерация и проверка экспериментальных артефактов. |
 
-## Запуск
-
-Требуются Docker, Docker Compose v2, Go 1.25 и Python 3.
+## Быстрый запуск
 
 ```bash
+make deps
+make test
 make up
 make migrate
-make test
 make experiment
 make verify-results
 make down
 ```
 
-Результаты эксперимента сохраняются в `results/latest/`:
+`make deps` создает локальное Python-окружение `.venv` и устанавливает зависимости для построения графиков. `make experiment` использует фиксированный seed `4116`, выполняет серии нагрузки и fault-сценарии, затем сохраняет результаты в `results/latest/`.
 
-- `summary.json` — сводные метрики и результаты проверок;
-- `metrics.csv` — табличная форма для отчета;
-- `metrics_plot.png` или `metrics_plot.svg` — график ключевых метрик.
+## Экспериментальная методика
 
-## Метрики
+Стенд строит сравнение не на экспертной оценке, а на цепочке:
 
-Стенд фиксирует:
+`критерий -> сценарий стенда -> метрика -> результат -> вывод -> рекомендация`.
 
-- p50/p95 latency для синхронной и Outbox-обработки;
-- throughput в запросах в секунду;
-- количество уникальных, потерянных и дублированных событий;
-- backlog Outbox и возраст старейшей записи;
-- lag Redis Streams;
-- число завершенных и компенсированных saga.
+Проверяемые критерии:
 
-## Интерпретация
+- масштабируемость: серии нагрузки `100/500/1000` для `sync_transaction`, `outbox_transaction` и `chat_fanout`, по 5 повторов;
+- надежность: duplicate callback, publish-no-ack, потеря Pub/Sub для позднего подписчика, WebSocket replay, stale cache, успешная и компенсированная Saga;
+- производительность: p50/p95/p99 latency, throughput и error rate;
+- сложность внедрения: число реализованных компонентов, состояний, контрактов и worker-путей;
+- стоимость эксплуатации: stateful-компоненты, длина stream, attempts, backlog, требования к истории;
+- наблюдаемость: наличие метрик, по которым можно доказать или опровергнуть архитектурный вывод.
 
-Стенд не моделирует всю MMORPG-платформу. Его задача — изолировать архитектурные свойства интеграционных паттернов и проверить критичные инварианты: сохранность состояния, идемпотентность, восстановление после сбоя доставки и различие между ephemeral и durable messaging.
+## Артефакты
+
+После `make experiment` создаются:
+
+| Файл | Содержание |
+| --- | --- |
+| `summary.json` | Машиночитаемая сводка запуска: параметры, серии нагрузки, fault-сценарии, матрица сравнения, evidence trace и рекомендации. |
+| `metrics.csv` | Нормализованная выгрузка метрик для повторной обработки. |
+| `scenario_runs.csv` | 45 строк отдельных запусков: 3 сценария x 3 размера нагрузки x 5 повторов. |
+| `comparison_matrix.csv` | Итоговая экспериментальная матрица по решениям и критериям. |
+| `criteria_scores.csv` | Развернутые оценки каждого решения по каждому критерию. |
+| `evidence_trace.json` | Связи между критерием, сценарием, метрикой, результатом и выводом. |
+| `recommendations.json` | Практические рекомендации с привязкой к экспериментальному доказательству. |
+
+Графики:
+
+- `latency_comparison.png`;
+- `throughput_comparison.png`;
+- `reliability_matrix.png`;
+- `outbox_backlog.png`;
+- `cache_consistency.png`;
+- `saga_outcomes.png`;
+- `criteria_radar.png`;
+- `metrics_plot.png`.
+
+## Наблюдаемые метрики
+
+Endpoint `/metrics/summary` возвращает показатели, используемые в отчете и автоматической проверке:
+
+- `inbox_count`;
+- `outbox_published`;
+- `outbox_attempts_total`;
+- `outbox_oldest_pending_ms`;
+- `outbox_pending`;
+- `chat_messages`;
+- `chat_stream_len`;
+- `redis_stream_len`;
+- `redis_duplicate_events`;
+- `saga_duration_avg_ms`;
+- `saga_duration_p95_ms`;
+- `saga_completed`;
+- `saga_compensated`.
+
+В ответах `/chat` и `/saga/purchase` дополнительно возвращается `latency_ms`, чтобы latency измерялась на уровне прикладного сценария, а не только внешним таймером Python runner.
+
+## Интерпретация результатов
+
+Стенд не моделирует весь production-кластер MMORPG. Его назначение другое: воспроизвести классы отказов и проверить причинные свойства паттернов.
+
+Основные подтверждаемые выводы:
+
+- PostgreSQL остается source of truth для экономики, прогресса, инвентаря и аудита;
+- Inbox/idempotency предотвращает повторный бизнес-эффект при повторной доставке callback;
+- Transactional Outbox устраняет риск двойной записи между PostgreSQL и брокером, но требует идемпотентных потребителей;
+- Redis Pub/Sub пригоден для live fan-out, но не является durable-журналом;
+- Redis Streams нужен для replay и восстановления WebSocket-клиента;
+- Saga оправдана только для долгих экономических цепочек с явными компенсациями;
+- cache-aside не должен быть источником решений для критичной экономики из-за риска stale read;
+- архитектурная рекомендация считается доказанной только при наличии наблюдаемой метрики или fault-сценария.
+
+## Ограничения валидности
+
+Локальные значения latency и throughput не являются универсальным benchmark. Они зависят от машины, Docker, версии runtime и фоновой нагрузки. В отчете используются не абсолютные значения как промышленная норма, а воспроизводимая структура доказательств: инварианты, fault-сценарии, наличие backlog, повторная доставка, replay, Saga outcomes и stale cache.
+
+## Структура
+
+```text
+.
+├── cmd/researchd          # backend, worker, API, WebSocket, Saga, cache-aside
+├── cmd/wscheck            # проверка WebSocket replay
+├── docs                   # архитектура и методика экспериментов
+├── internal/expstats      # тестируемые функции статистики
+├── scripts                # запуск экспериментов и проверка результатов
+└── results/latest         # CSV/JSON/PNG-артефакты последнего запуска
+```

@@ -125,8 +125,12 @@ create table if not exists sagas (
 	price integer not null,
 	status text not null,
 	step text not null,
+	created_at timestamptz not null default now(),
+	finished_at timestamptz,
 	updated_at timestamptz not null default now()
-);`
+);
+alter table sagas add column if not exists created_at timestamptz not null default now();
+alter table sagas add column if not exists finished_at timestamptz;`
 	_, err := a.db.Exec(ctx, sql)
 	return err
 }
@@ -330,6 +334,7 @@ func (a *app) handleChat(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	start := time.Now()
 	var req struct {
 		Room    string `json:"room"`
 		UserID  string `json:"user_id"`
@@ -359,7 +364,11 @@ insert into chat_messages(room, user_id, message) values($1, $2, $3) returning i
 		Stream: "mmorpg:chat-stream",
 		Values: map[string]any{"event_id": fmt.Sprintf("chat:%d", id), "payload": string(payload)},
 	}).Err()
-	writeJSON(w, map[string]any{"ok": true, "chat_id": id})
+	writeJSON(w, map[string]any{
+		"ok":         true,
+		"chat_id":    id,
+		"latency_ms": float64(time.Since(start).Microseconds()) / 1000,
+	})
 }
 
 func (a *app) handleSagaPurchase(w http.ResponseWriter, r *http.Request) {
@@ -367,6 +376,7 @@ func (a *app) handleSagaPurchase(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	start := time.Now()
 	var req sagaRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -393,7 +403,12 @@ on conflict (id) do nothing`,
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	writeJSON(w, map[string]any{"ok": true, "saga_id": req.SagaID, "status": "pending"})
+	writeJSON(w, map[string]any{
+		"ok":         true,
+		"saga_id":    req.SagaID,
+		"status":     "pending",
+		"latency_ms": float64(time.Since(start).Microseconds()) / 1000,
+	})
 }
 
 func (a *app) handleWS(w http.ResponseWriter, r *http.Request) {
@@ -498,17 +513,41 @@ func (a *app) handleMetrics(w http.ResponseWriter, r *http.Request) {
 
 func (a *app) collectSummary(ctx context.Context) (map[string]any, error) {
 	var outboxPending int
-	var outboxMaxAge float64
+	var outboxOldestPending float64
 	if err := a.db.QueryRow(ctx, `
 select count(*), coalesce(extract(epoch from max(now() - created_at))*1000, 0)
-from outbox where status='pending'`).Scan(&outboxPending, &outboxMaxAge); err != nil {
+from outbox where status='pending'`).Scan(&outboxPending, &outboxOldestPending); err != nil {
+		return nil, err
+	}
+	var inboxCount, outboxPublished, outboxAttemptsTotal, chatMessages int
+	if err := a.db.QueryRow(ctx, `select count(*) from inbox`).Scan(&inboxCount); err != nil {
+		return nil, err
+	}
+	if err := a.db.QueryRow(ctx, `
+select
+	count(*) filter (where status='published'),
+	coalesce(sum(attempts), 0)
+from outbox`).Scan(&outboxPublished, &outboxAttemptsTotal); err != nil {
+		return nil, err
+	}
+	if err := a.db.QueryRow(ctx, `select count(*) from chat_messages`).Scan(&chatMessages); err != nil {
 		return nil, err
 	}
 	var completed, compensated int
 	if err := a.db.QueryRow(ctx, `select count(*) filter (where status='completed'), count(*) filter (where status='compensated') from sagas`).Scan(&completed, &compensated); err != nil {
 		return nil, err
 	}
+	var sagaDurationAvg, sagaDurationP95 float64
+	if err := a.db.QueryRow(ctx, `
+select
+	coalesce(avg(extract(epoch from (finished_at - created_at))*1000), 0),
+	coalesce(percentile_cont(0.95) within group (order by extract(epoch from (finished_at - created_at))*1000), 0)
+from sagas
+where finished_at is not null`).Scan(&sagaDurationAvg, &sagaDurationP95); err != nil {
+		return nil, err
+	}
 	messages, _ := a.redis.XRange(ctx, eventStream, "-", "+").Result()
+	chatStreamLen, _ := a.redis.XLen(ctx, "mmorpg:chat-stream").Result()
 	seen := map[string]int{}
 	for _, msg := range messages {
 		if value, ok := msg.Values["event_id"].(string); ok {
@@ -523,12 +562,20 @@ from outbox where status='pending'`).Scan(&outboxPending, &outboxMaxAge); err !=
 	}
 	return map[string]any{
 		"outbox_pending":               outboxPending,
-		"outbox_max_age_ms":            outboxMaxAge,
+		"outbox_max_age_ms":            outboxOldestPending,
+		"outbox_oldest_pending_ms":     outboxOldestPending,
+		"outbox_published":             outboxPublished,
+		"outbox_attempts_total":        outboxAttemptsTotal,
+		"inbox_count":                  inboxCount,
+		"chat_messages":                chatMessages,
+		"chat_stream_len":              chatStreamLen,
 		"redis_stream_len":             len(messages),
 		"redis_unique_events":          len(seen),
 		"redis_duplicate_events":       duplicates,
 		"saga_completed":               completed,
 		"saga_compensated":             compensated,
+		"saga_duration_avg_ms":         sagaDurationAvg,
+		"saga_duration_p95_ms":         sagaDurationP95,
 		"transport_duplicate_observed": duplicates > 0,
 	}, nil
 }
@@ -658,7 +705,7 @@ for update skip locked`)
 			status = "completed"
 			step = "commit"
 		}
-		if _, err := tx.Exec(ctx, `update sagas set status=$2, step=$3, updated_at=now() where id=$1`, item.id, status, step); err != nil {
+		if _, err := tx.Exec(ctx, `update sagas set status=$2, step=$3, finished_at=now(), updated_at=now() where id=$1`, item.id, status, step); err != nil {
 			return err
 		}
 		payload, _ := json.Marshal(map[string]any{"saga_id": item.id, "player_id": item.playerID, "status": status, "step": step})

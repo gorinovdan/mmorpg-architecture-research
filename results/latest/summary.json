@@ -1,53 +1,706 @@
 {
   "seed": 4116,
-  "started_at": "2026-06-21T14:13:30Z",
-  "sync_transaction": {
-    "count": 80,
-    "p50_ms": 0.429,
-    "p95_ms": 0.7369499999999995,
-    "throughput_rps": 746.6927770632035
-  },
-  "outbox_delivery": {
-    "count": 80,
-    "p50_ms": 0.4875,
-    "p95_ms": 0.76505,
-    "throughput_rps": 778.2704961949803
-  },
-  "duplicate_callback": {
-    "requests": 5,
-    "duplicates_reported": 4,
-    "final_gold": 7
-  },
-  "pubsub_loss": {
-    "delivered_to_late_subscriber": false
-  },
-  "cache_stale": {
-    "actual_gold": 150,
-    "cached_gold": 100,
-    "stale": true
-  },
-  "saga": {
-    "outbox_max_age_ms": 119.998,
-    "outbox_pending": 2,
-    "redis_duplicate_events": 1,
-    "redis_stream_len": 83,
-    "redis_unique_events": 82,
-    "saga_compensated": 1,
-    "saga_completed": 1,
-    "transport_duplicate_observed": true
-  },
-  "websocket_replay": {
-    "received": 3
+  "started_at": "2026-06-21T15:32:55Z",
+  "load_sizes": [
+    100,
+    500,
+    1000
+  ],
+  "repeats": 5,
+  "performance_series": [
+    {
+      "scenario": "chat_fanout",
+      "load": 100,
+      "repeats": 5,
+      "count_total": 500,
+      "p50_ms_mean": 0.3136,
+      "p95_ms_mean": 0.6054799999999999,
+      "p99_ms_mean": 0.9456900000000028,
+      "throughput_rps_mean": 762.3162200178456,
+      "error_rate_mean": 0.0
+    },
+    {
+      "scenario": "chat_fanout",
+      "load": 500,
+      "repeats": 5,
+      "count_total": 2500,
+      "p50_ms_mean": 0.275,
+      "p95_ms_mean": 0.5008599999999997,
+      "p99_ms_mean": 0.8430639999999997,
+      "throughput_rps_mean": 911.6146514411261,
+      "error_rate_mean": 0.0
+    },
+    {
+      "scenario": "chat_fanout",
+      "load": 1000,
+      "repeats": 5,
+      "count_total": 5000,
+      "p50_ms_mean": 0.26580000000000004,
+      "p95_ms_mean": 0.46144999999999997,
+      "p99_ms_mean": 0.6577299999999998,
+      "throughput_rps_mean": 965.9981300032803,
+      "error_rate_mean": 0.0
+    },
+    {
+      "scenario": "outbox_transaction",
+      "load": 100,
+      "repeats": 5,
+      "count_total": 500,
+      "p50_ms_mean": 0.4701000000000001,
+      "p95_ms_mean": 0.8318899999999999,
+      "p99_ms_mean": 0.9645620000000015,
+      "throughput_rps_mean": 741.0483179431725,
+      "error_rate_mean": 0.0
+    },
+    {
+      "scenario": "outbox_transaction",
+      "load": 500,
+      "repeats": 5,
+      "count_total": 2500,
+      "p50_ms_mean": 0.45289999999999997,
+      "p95_ms_mean": 0.7554999999999998,
+      "p99_ms_mean": 1.026225999999999,
+      "throughput_rps_mean": 737.1526806764584,
+      "error_rate_mean": 0.0
+    },
+    {
+      "scenario": "outbox_transaction",
+      "load": 1000,
+      "repeats": 5,
+      "count_total": 5000,
+      "p50_ms_mean": 0.45289999999999997,
+      "p95_ms_mean": 0.7673399999999998,
+      "p99_ms_mean": 1.1799499999999994,
+      "throughput_rps_mean": 755.6528466445191,
+      "error_rate_mean": 0.0
+    },
+    {
+      "scenario": "sync_transaction",
+      "load": 100,
+      "repeats": 5,
+      "count_total": 500,
+      "p50_ms_mean": 0.44830000000000003,
+      "p95_ms_mean": 1.1078199999999998,
+      "p99_ms_mean": 1.734880000000004,
+      "throughput_rps_mean": 682.9734561663558,
+      "error_rate_mean": 0.0
+    },
+    {
+      "scenario": "sync_transaction",
+      "load": 500,
+      "repeats": 5,
+      "count_total": 2500,
+      "p50_ms_mean": 0.3788,
+      "p95_ms_mean": 0.6054599999999997,
+      "p99_ms_mean": 1.1498199999999983,
+      "throughput_rps_mean": 845.7156626692067,
+      "error_rate_mean": 0.0
+    },
+    {
+      "scenario": "sync_transaction",
+      "load": 1000,
+      "repeats": 5,
+      "count_total": 5000,
+      "p50_ms_mean": 0.37320000000000003,
+      "p95_ms_mean": 0.6023099999999999,
+      "p99_ms_mean": 0.8161599999999997,
+      "throughput_rps_mean": 858.6703567178777,
+      "error_rate_mean": 0.0
+    }
+  ],
+  "fault_scenarios": {
+    "duplicate_callback": {
+      "requests": 5,
+      "duplicates_reported": 4,
+      "final_gold": 7,
+      "business_effect_count": 1
+    },
+    "publish_no_ack": {
+      "duplicate_events_before": 0,
+      "duplicate_events_after": 1,
+      "transport_duplicate_observed": true,
+      "outbox_pending_after": 0,
+      "outbox_attempts_total": 8003
+    },
+    "pubsub_loss": {
+      "delivered_to_late_subscriber": false
+    },
+    "cache_stale": {
+      "actual_gold": 150,
+      "cached_gold": 100,
+      "stale": true
+    },
+    "saga": {
+      "submit_latency_ms": [
+        4.163,
+        1.474
+      ],
+      "saga_completed": 1,
+      "saga_compensated": 1,
+      "saga_duration_avg_ms": 19.8945,
+      "saga_duration_p95_ms": 22.36995
+    },
+    "websocket_replay": {
+      "received": 3
+    }
   },
   "final_metrics": {
+    "chat_messages": 8000,
+    "chat_stream_len": 8000,
+    "inbox_count": 16003,
+    "outbox_attempts_total": 8005,
     "outbox_max_age_ms": 0,
+    "outbox_oldest_pending_ms": 0,
     "outbox_pending": 0,
+    "outbox_published": 8004,
     "redis_duplicate_events": 1,
-    "redis_stream_len": 85,
-    "redis_unique_events": 84,
+    "redis_stream_len": 8005,
+    "redis_unique_events": 8004,
     "saga_compensated": 1,
     "saga_completed": 1,
+    "saga_duration_avg_ms": 19.8945,
+    "saga_duration_p95_ms": 22.36995,
     "transport_duplicate_observed": true
   },
-  "plot": "metrics_plot.png"
+  "comparison_matrix": [
+    {
+      "solution": "PostgreSQL synchronous transaction",
+      "scalability": 5,
+      "reliability": 4,
+      "performance": 5,
+      "implementation_complexity": 4,
+      "operational_cost": 4,
+      "observability": 3,
+      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps",
+      "conclusion": "подходит как source of truth для критичного состояния, но не решает fan-out событий",
+      "score_total": 4.17
+    },
+    {
+      "solution": "Transactional Outbox",
+      "scalability": 5,
+      "reliability": 5,
+      "performance": 5,
+      "implementation_complexity": 3,
+      "operational_cost": 3,
+      "observability": 5,
+      "evidence": "outbox load=1000: p95=0.767 ms; pending=0",
+      "conclusion": "обеспечивает восстановимую публикацию после commit при наличии worker и метрик backlog",
+      "score_total": 4.33
+    },
+    {
+      "solution": "Inbox/idempotency",
+      "scalability": 5,
+      "reliability": 5,
+      "performance": 5,
+      "implementation_complexity": 4,
+      "operational_cost": 5,
+      "observability": 4,
+      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7",
+      "conclusion": "предотвращает повторный бизнес-эффект при повторной доставке",
+      "score_total": 4.67
+    },
+    {
+      "solution": "Redis Streams",
+      "scalability": 5,
+      "reliability": 5,
+      "performance": 4,
+      "implementation_complexity": 3,
+      "operational_cost": 3,
+      "observability": 5,
+      "evidence": "stream_len=8005, replay_received=3",
+      "conclusion": "подходит для replay и контролируемой доставки, но требует политики хранения",
+      "score_total": 4.17
+    },
+    {
+      "solution": "Redis Pub/Sub",
+      "scalability": 5,
+      "reliability": 2,
+      "performance": 5,
+      "implementation_complexity": 5,
+      "operational_cost": 4,
+      "observability": 2,
+      "evidence": "late subscriber delivered=False",
+      "conclusion": "пригоден для live fan-out, но не для durable-доставки критичного состояния",
+      "score_total": 3.83
+    },
+    {
+      "solution": "WebSocket gateway",
+      "scalability": 4,
+      "reliability": 4,
+      "performance": 4,
+      "implementation_complexity": 3,
+      "operational_cost": 3,
+      "observability": 4,
+      "evidence": "WebSocket replay received=3",
+      "conclusion": "нужен для realtime-доставки, но восстановление должно опираться на persisted stream",
+      "score_total": 3.67
+    },
+    {
+      "solution": "Saga orchestration",
+      "scalability": 3,
+      "reliability": 5,
+      "performance": 3,
+      "implementation_complexity": 2,
+      "operational_cost": 2,
+      "observability": 5,
+      "evidence": "completed=1, compensated=1, p95=22.370 ms",
+      "conclusion": "подходит для долгих экономических цепочек с явными компенсациями",
+      "score_total": 3.33
+    },
+    {
+      "solution": "Cache-aside",
+      "scalability": 5,
+      "reliability": 2,
+      "performance": 5,
+      "implementation_complexity": 4,
+      "operational_cost": 4,
+      "observability": 3,
+      "evidence": "cached=100, actual=150, stale=True",
+      "conclusion": "ускоряет чтение, но не может быть основанием для экономических решений",
+      "score_total": 3.83
+    },
+    {
+      "solution": "Chat event fan-out",
+      "scalability": 5,
+      "reliability": 4,
+      "performance": 5,
+      "implementation_complexity": 4,
+      "operational_cost": 4,
+      "observability": 4,
+      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000",
+      "conclusion": "подходит для массовых сообщений при разделении transient Pub/Sub и stream history",
+      "score_total": 4.33
+    }
+  ],
+  "criteria_scores": [
+    {
+      "criterion": "scalability",
+      "solution": "PostgreSQL synchronous transaction",
+      "score": 5,
+      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "PostgreSQL synchronous transaction",
+      "score": 4,
+      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+    },
+    {
+      "criterion": "performance",
+      "solution": "PostgreSQL synchronous transaction",
+      "score": 5,
+      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "PostgreSQL synchronous transaction",
+      "score": 4,
+      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "PostgreSQL synchronous transaction",
+      "score": 4,
+      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+    },
+    {
+      "criterion": "observability",
+      "solution": "PostgreSQL synchronous transaction",
+      "score": 3,
+      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "Transactional Outbox",
+      "score": 5,
+      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "Transactional Outbox",
+      "score": 5,
+      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+    },
+    {
+      "criterion": "performance",
+      "solution": "Transactional Outbox",
+      "score": 5,
+      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "Transactional Outbox",
+      "score": 3,
+      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "Transactional Outbox",
+      "score": 3,
+      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+    },
+    {
+      "criterion": "observability",
+      "solution": "Transactional Outbox",
+      "score": 5,
+      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "Inbox/idempotency",
+      "score": 5,
+      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "Inbox/idempotency",
+      "score": 5,
+      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+    },
+    {
+      "criterion": "performance",
+      "solution": "Inbox/idempotency",
+      "score": 5,
+      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "Inbox/idempotency",
+      "score": 4,
+      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "Inbox/idempotency",
+      "score": 5,
+      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+    },
+    {
+      "criterion": "observability",
+      "solution": "Inbox/idempotency",
+      "score": 4,
+      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "Redis Streams",
+      "score": 5,
+      "evidence": "stream_len=8005, replay_received=3"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "Redis Streams",
+      "score": 5,
+      "evidence": "stream_len=8005, replay_received=3"
+    },
+    {
+      "criterion": "performance",
+      "solution": "Redis Streams",
+      "score": 4,
+      "evidence": "stream_len=8005, replay_received=3"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "Redis Streams",
+      "score": 3,
+      "evidence": "stream_len=8005, replay_received=3"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "Redis Streams",
+      "score": 3,
+      "evidence": "stream_len=8005, replay_received=3"
+    },
+    {
+      "criterion": "observability",
+      "solution": "Redis Streams",
+      "score": 5,
+      "evidence": "stream_len=8005, replay_received=3"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "Redis Pub/Sub",
+      "score": 5,
+      "evidence": "late subscriber delivered=False"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "Redis Pub/Sub",
+      "score": 2,
+      "evidence": "late subscriber delivered=False"
+    },
+    {
+      "criterion": "performance",
+      "solution": "Redis Pub/Sub",
+      "score": 5,
+      "evidence": "late subscriber delivered=False"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "Redis Pub/Sub",
+      "score": 5,
+      "evidence": "late subscriber delivered=False"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "Redis Pub/Sub",
+      "score": 4,
+      "evidence": "late subscriber delivered=False"
+    },
+    {
+      "criterion": "observability",
+      "solution": "Redis Pub/Sub",
+      "score": 2,
+      "evidence": "late subscriber delivered=False"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "WebSocket gateway",
+      "score": 4,
+      "evidence": "WebSocket replay received=3"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "WebSocket gateway",
+      "score": 4,
+      "evidence": "WebSocket replay received=3"
+    },
+    {
+      "criterion": "performance",
+      "solution": "WebSocket gateway",
+      "score": 4,
+      "evidence": "WebSocket replay received=3"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "WebSocket gateway",
+      "score": 3,
+      "evidence": "WebSocket replay received=3"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "WebSocket gateway",
+      "score": 3,
+      "evidence": "WebSocket replay received=3"
+    },
+    {
+      "criterion": "observability",
+      "solution": "WebSocket gateway",
+      "score": 4,
+      "evidence": "WebSocket replay received=3"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "Saga orchestration",
+      "score": 3,
+      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "Saga orchestration",
+      "score": 5,
+      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+    },
+    {
+      "criterion": "performance",
+      "solution": "Saga orchestration",
+      "score": 3,
+      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "Saga orchestration",
+      "score": 2,
+      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "Saga orchestration",
+      "score": 2,
+      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+    },
+    {
+      "criterion": "observability",
+      "solution": "Saga orchestration",
+      "score": 5,
+      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "Cache-aside",
+      "score": 5,
+      "evidence": "cached=100, actual=150, stale=True"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "Cache-aside",
+      "score": 2,
+      "evidence": "cached=100, actual=150, stale=True"
+    },
+    {
+      "criterion": "performance",
+      "solution": "Cache-aside",
+      "score": 5,
+      "evidence": "cached=100, actual=150, stale=True"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "Cache-aside",
+      "score": 4,
+      "evidence": "cached=100, actual=150, stale=True"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "Cache-aside",
+      "score": 4,
+      "evidence": "cached=100, actual=150, stale=True"
+    },
+    {
+      "criterion": "observability",
+      "solution": "Cache-aside",
+      "score": 3,
+      "evidence": "cached=100, actual=150, stale=True"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "Chat event fan-out",
+      "score": 5,
+      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "Chat event fan-out",
+      "score": 4,
+      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+    },
+    {
+      "criterion": "performance",
+      "solution": "Chat event fan-out",
+      "score": 5,
+      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "Chat event fan-out",
+      "score": 4,
+      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "Chat event fan-out",
+      "score": 4,
+      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+    },
+    {
+      "criterion": "observability",
+      "solution": "Chat event fan-out",
+      "score": 4,
+      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+    }
+  ],
+  "evidence_trace": [
+    {
+      "criterion": "Масштабируемость",
+      "scenario": "load series 100/500/1000 for sync/outbox/chat",
+      "metric": "throughput_rps_mean and error_rate_mean",
+      "artifact": "scenario_runs.csv, throughput_comparison.png",
+      "result": "серии выполнены без ошибок; throughput зафиксирован для каждого класса обработки",
+      "conclusion": "горизонтально масштабируемые каналы нужны прежде всего для fan-out и worker-обработки событий"
+    },
+    {
+      "criterion": "Надёжность",
+      "scenario": "duplicate callback, publish-no-ack, Pub/Sub loss, WebSocket replay, stale cache, Saga",
+      "metric": "duplicates_reported, redis_duplicate_events, delivered_to_late_subscriber, stale, saga_completed/compensated",
+      "artifact": "summary.json, reliability_matrix.png",
+      "result": "duplicates=4; stream_duplicates=1; pubsub_late=False",
+      "conclusion": "надёжность достигается комбинацией Outbox, Inbox, Streams, Saga и source of truth"
+    },
+    {
+      "criterion": "Производительность",
+      "scenario": "sync/outbox/chat latency and throughput series",
+      "metric": "p50/p95/p99 latency, throughput",
+      "artifact": "latency_comparison.png, throughput_comparison.png",
+      "result": "локальные p95 и p99 измерены для каждого размера нагрузки и повторения",
+      "conclusion": "Outbox не должен трактоваться как бесплатный механизм: его overhead приемлем только при контроле backlog"
+    },
+    {
+      "criterion": "Сложность внедрения",
+      "scenario": "implemented components and state machines",
+      "metric": "component/state/contract count, Saga states, worker path",
+      "artifact": "comparison_matrix.csv",
+      "result": "наибольшую сложность имеют Saga orchestration, WebSocket gateway и Outbox worker",
+      "conclusion": "сложные паттерны следует применять только для сценариев, где простая транзакция не закрывает риск"
+    },
+    {
+      "criterion": "Стоимость эксплуатации",
+      "scenario": "stateful dependencies and retained history",
+      "metric": "PostgreSQL, Redis, worker, stream length, outbox attempts",
+      "artifact": "comparison_matrix.csv, outbox_backlog.png",
+      "result": "stream_len=8005; outbox_attempts=8005",
+      "conclusion": "эксплуатационная стоимость определяется не только БД, но и политикой хранения stream/outbox и наблюдаемостью worker"
+    },
+    {
+      "criterion": "Наблюдаемость",
+      "scenario": "/metrics/summary and generated artifacts",
+      "metric": "outbox_oldest_pending_ms, stream length, duplicates, saga duration, cache stale",
+      "artifact": "summary.json, evidence_trace.json",
+      "result": "каждая итоговая рекомендация привязана к источнику метрик или fault-сценарию",
+      "conclusion": "архитектурная рекомендация считается проверенной только при наличии наблюдаемой метрики"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "R1",
+      "recommendation": "PostgreSQL использовать как source of truth для экономики, инвентаря, прогресса и аудита.",
+      "evidence": "sync_transaction series, cache_stale",
+      "reason": "cache stale reproduced: cached=100, actual=150"
+    },
+    {
+      "id": "R2",
+      "recommendation": "Каждую внешнюю команду и callback снабжать idempotency key и фиксировать в Inbox.",
+      "evidence": "duplicate_callback",
+      "reason": "5 повторов одной команды дали один бизнес-результат и 4 зарегистрированных дубля."
+    },
+    {
+      "id": "R3",
+      "recommendation": "Исходящие доменные события публиковать через Transactional Outbox и идемпотентных потребителей.",
+      "evidence": "publish_no_ack, outbox_delivery series",
+      "reason": "publish-no-ack created duplicate transport event; final outbox_pending=0."
+    },
+    {
+      "id": "R4",
+      "recommendation": "Redis Pub/Sub использовать только для transient fan-out, а Redis Streams — для replay и контролируемой доставки.",
+      "evidence": "pubsub_loss, websocket_replay",
+      "reason": "late subscriber delivered=False; ws replay received=3."
+    },
+    {
+      "id": "R5",
+      "recommendation": "Saga применять только для долгих экономических операций с явными компенсациями.",
+      "evidence": "saga",
+      "reason": "completed=1, compensated=1."
+    },
+    {
+      "id": "R6",
+      "recommendation": "В мониторинг включить outbox backlog age, stream lag, duplicates, Saga duration, cache stale и error rate.",
+      "evidence": "/metrics/summary, evidence_trace.json",
+      "reason": "без этих метрик нельзя доказательно связать отказ с архитектурной причиной."
+    }
+  ],
+  "artifacts": [
+    "summary.json",
+    "metrics.csv",
+    "scenario_runs.csv",
+    "comparison_matrix.csv",
+    "criteria_scores.csv",
+    "evidence_trace.json",
+    "recommendations.json",
+    "latency_comparison.png",
+    "throughput_comparison.png",
+    "reliability_matrix.png",
+    "outbox_backlog.png",
+    "cache_consistency.png",
+    "saga_outcomes.png",
+    "criteria_radar.png",
+    "metrics_plot.png"
+  ]
 }

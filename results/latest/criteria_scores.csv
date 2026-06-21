@@ -1,0 +1,55 @@
+criterion,solution,score,evidence
+scalability,PostgreSQL synchronous transaction,5,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+reliability,PostgreSQL synchronous transaction,4,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+performance,PostgreSQL synchronous transaction,5,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+implementation_complexity,PostgreSQL synchronous transaction,4,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+operational_cost,PostgreSQL synchronous transaction,4,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+observability,PostgreSQL synchronous transaction,3,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+scalability,Transactional Outbox,5,outbox load=1000: p95=0.767 ms; pending=0
+reliability,Transactional Outbox,5,outbox load=1000: p95=0.767 ms; pending=0
+performance,Transactional Outbox,5,outbox load=1000: p95=0.767 ms; pending=0
+implementation_complexity,Transactional Outbox,3,outbox load=1000: p95=0.767 ms; pending=0
+operational_cost,Transactional Outbox,3,outbox load=1000: p95=0.767 ms; pending=0
+observability,Transactional Outbox,5,outbox load=1000: p95=0.767 ms; pending=0
+scalability,Inbox/idempotency,5,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
+reliability,Inbox/idempotency,5,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
+performance,Inbox/idempotency,5,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
+implementation_complexity,Inbox/idempotency,4,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
+operational_cost,Inbox/idempotency,5,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
+observability,Inbox/idempotency,4,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
+scalability,Redis Streams,5,"stream_len=8005, replay_received=3"
+reliability,Redis Streams,5,"stream_len=8005, replay_received=3"
+performance,Redis Streams,4,"stream_len=8005, replay_received=3"
+implementation_complexity,Redis Streams,3,"stream_len=8005, replay_received=3"
+operational_cost,Redis Streams,3,"stream_len=8005, replay_received=3"
+observability,Redis Streams,5,"stream_len=8005, replay_received=3"
+scalability,Redis Pub/Sub,5,late subscriber delivered=False
+reliability,Redis Pub/Sub,2,late subscriber delivered=False
+performance,Redis Pub/Sub,5,late subscriber delivered=False
+implementation_complexity,Redis Pub/Sub,5,late subscriber delivered=False
+operational_cost,Redis Pub/Sub,4,late subscriber delivered=False
+observability,Redis Pub/Sub,2,late subscriber delivered=False
+scalability,WebSocket gateway,4,WebSocket replay received=3
+reliability,WebSocket gateway,4,WebSocket replay received=3
+performance,WebSocket gateway,4,WebSocket replay received=3
+implementation_complexity,WebSocket gateway,3,WebSocket replay received=3
+operational_cost,WebSocket gateway,3,WebSocket replay received=3
+observability,WebSocket gateway,4,WebSocket replay received=3
+scalability,Saga orchestration,3,"completed=1, compensated=1, p95=22.370 ms"
+reliability,Saga orchestration,5,"completed=1, compensated=1, p95=22.370 ms"
+performance,Saga orchestration,3,"completed=1, compensated=1, p95=22.370 ms"
+implementation_complexity,Saga orchestration,2,"completed=1, compensated=1, p95=22.370 ms"
+operational_cost,Saga orchestration,2,"completed=1, compensated=1, p95=22.370 ms"
+observability,Saga orchestration,5,"completed=1, compensated=1, p95=22.370 ms"
+scalability,Cache-aside,5,"cached=100, actual=150, stale=True"
+reliability,Cache-aside,2,"cached=100, actual=150, stale=True"
+performance,Cache-aside,5,"cached=100, actual=150, stale=True"
+implementation_complexity,Cache-aside,4,"cached=100, actual=150, stale=True"
+operational_cost,Cache-aside,4,"cached=100, actual=150, stale=True"
+observability,Cache-aside,3,"cached=100, actual=150, stale=True"
+scalability,Chat event fan-out,5,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+reliability,Chat event fan-out,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+performance,Chat event fan-out,5,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+implementation_complexity,Chat event fan-out,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+operational_cost,Chat event fan-out,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+observability,Chat event fan-out,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"

@@ -1,0 +1,10 @@
+solution,scalability,reliability,performance,implementation_complexity,operational_cost,observability,evidence,conclusion,score_total
+PostgreSQL synchronous transaction,5,4,5,4,4,3,"sync load=1000: p95=0.602 ms, throughput=858.67 rps","подходит как source of truth для критичного состояния, но не решает fan-out событий",4.17
+Transactional Outbox,5,5,5,3,3,5,outbox load=1000: p95=0.767 ms; pending=0,обеспечивает восстановимую публикацию после commit при наличии worker и метрик backlog,4.33
+Inbox/idempotency,5,5,5,4,5,4,"5 duplicate callback requests -> 4 duplicates, final_gold=7",предотвращает повторный бизнес-эффект при повторной доставке,4.67
+Redis Streams,5,5,4,3,3,5,"stream_len=8005, replay_received=3","подходит для replay и контролируемой доставки, но требует политики хранения",4.17
+Redis Pub/Sub,5,2,5,5,4,2,late subscriber delivered=False,"пригоден для live fan-out, но не для durable-доставки критичного состояния",3.83
+WebSocket gateway,4,4,4,3,3,4,WebSocket replay received=3,"нужен для realtime-доставки, но восстановление должно опираться на persisted stream",3.67
+Saga orchestration,3,5,3,2,2,5,"completed=1, compensated=1, p95=22.370 ms",подходит для долгих экономических цепочек с явными компенсациями,3.33
+Cache-aside,5,2,5,4,4,3,"cached=100, actual=150, stale=True","ускоряет чтение, но не может быть основанием для экономических решений",3.83
+Chat event fan-out,5,4,5,4,4,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000",подходит для массовых сообщений при разделении transient Pub/Sub и stream history,4.33

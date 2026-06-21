@@ -1,6 +1,12 @@
 SHELL := /bin/sh
+PYTHON := .venv/bin/python
 
-.PHONY: up migrate test experiment verify-results down logs clean
+.PHONY: deps up migrate test experiment verify-results down logs clean
+
+deps:
+	python3 -m venv .venv
+	$(PYTHON) -m pip install --upgrade pip
+	$(PYTHON) -m pip install -r requirements.txt
 
 up:
 	docker compose up -d --build postgres redis backend worker
@@ -12,13 +18,13 @@ migrate:
 test:
 	go test ./...
 	docker compose config >/dev/null
-	python3 -m py_compile scripts/run_experiments.py scripts/verify_results.py
+	$(PYTHON) -m py_compile scripts/run_experiments.py scripts/verify_results.py
 
 experiment:
-	python3 scripts/run_experiments.py --base-url http://localhost:18080 --ws-url ws://localhost:18080/ws?last=0-0 --out-dir results/latest
+	$(PYTHON) scripts/run_experiments.py --base-url http://localhost:18080 --ws-url ws://localhost:18080/ws?last=0-0 --out-dir results/latest
 
 verify-results:
-	python3 scripts/verify_results.py results/latest/summary.json
+	$(PYTHON) scripts/verify_results.py results/latest/summary.json
 
 logs:
 	docker compose logs --tail=120 backend worker

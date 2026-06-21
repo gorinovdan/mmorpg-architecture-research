@@ -1,0 +1,50 @@
+[
+  {
+    "criterion": "Масштабируемость",
+    "scenario": "load series 100/500/1000 for sync/outbox/chat",
+    "metric": "throughput_rps_mean and error_rate_mean",
+    "artifact": "scenario_runs.csv, throughput_comparison.png",
+    "result": "серии выполнены без ошибок; throughput зафиксирован для каждого класса обработки",
+    "conclusion": "горизонтально масштабируемые каналы нужны прежде всего для fan-out и worker-обработки событий"
+  },
+  {
+    "criterion": "Надёжность",
+    "scenario": "duplicate callback, publish-no-ack, Pub/Sub loss, WebSocket replay, stale cache, Saga",
+    "metric": "duplicates_reported, redis_duplicate_events, delivered_to_late_subscriber, stale, saga_completed/compensated",
+    "artifact": "summary.json, reliability_matrix.png",
+    "result": "duplicates=4; stream_duplicates=1; pubsub_late=False",
+    "conclusion": "надёжность достигается комбинацией Outbox, Inbox, Streams, Saga и source of truth"
+  },
+  {
+    "criterion": "Производительность",
+    "scenario": "sync/outbox/chat latency and throughput series",
+    "metric": "p50/p95/p99 latency, throughput",
+    "artifact": "latency_comparison.png, throughput_comparison.png",
+    "result": "локальные p95 и p99 измерены для каждого размера нагрузки и повторения",
+    "conclusion": "Outbox не должен трактоваться как бесплатный механизм: его overhead приемлем только при контроле backlog"
+  },
+  {
+    "criterion": "Сложность внедрения",
+    "scenario": "implemented components and state machines",
+    "metric": "component/state/contract count, Saga states, worker path",
+    "artifact": "comparison_matrix.csv",
+    "result": "наибольшую сложность имеют Saga orchestration, WebSocket gateway и Outbox worker",
+    "conclusion": "сложные паттерны следует применять только для сценариев, где простая транзакция не закрывает риск"
+  },
+  {
+    "criterion": "Стоимость эксплуатации",
+    "scenario": "stateful dependencies and retained history",
+    "metric": "PostgreSQL, Redis, worker, stream length, outbox attempts",
+    "artifact": "comparison_matrix.csv, outbox_backlog.png",
+    "result": "stream_len=8005; outbox_attempts=8005",
+    "conclusion": "эксплуатационная стоимость определяется не только БД, но и политикой хранения stream/outbox и наблюдаемостью worker"
+  },
+  {
+    "criterion": "Наблюдаемость",
+    "scenario": "/metrics/summary and generated artifacts",
+    "metric": "outbox_oldest_pending_ms, stream length, duplicates, saga duration, cache stale",
+    "artifact": "summary.json, evidence_trace.json",
+    "result": "каждая итоговая рекомендация привязана к источнику метрик или fault-сценарию",
+    "conclusion": "архитектурная рекомендация считается проверенной только при наличии наблюдаемой метрики"
+  }
+]
