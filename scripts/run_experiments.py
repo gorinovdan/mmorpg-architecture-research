@@ -568,18 +568,30 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
     import numpy as np
 
     plt.rcParams.update({
-        "font.family": "DejaVu Sans",
+        "font.family": "serif",
+        "font.serif": ["Times New Roman", "DejaVu Serif", "Liberation Serif"],
         "axes.titlesize": 13,
         "axes.labelsize": 10,
         "xtick.labelsize": 9,
         "ytick.labelsize": 9,
         "legend.fontsize": 8,
+        "figure.facecolor": "white",
+        "axes.facecolor": "white",
+        "axes.edgecolor": "#222222",
+        "axes.labelcolor": "#111111",
+        "xtick.color": "#111111",
+        "ytick.color": "#111111",
     })
 
     scenario_names = {
         "chat_fanout": "чат fan-out",
         "outbox_transaction": "Outbox-транзакция",
         "sync_transaction": "синхронная транзакция",
+    }
+    scenario_styles = {
+        "chat_fanout": {"color": "#111111", "marker": "o", "linestyle": "-"},
+        "outbox_transaction": {"color": "#555555", "marker": "s", "linestyle": "--"},
+        "sync_transaction": {"color": "#888888", "marker": "^", "linestyle": "-."},
     }
 
     def wrapped(text, width):
@@ -608,14 +620,16 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
         ax.plot(
             [row["load"] for row in rows],
             [row["p95_ms_mean"] for row in rows],
-            marker="o",
+            linewidth=1.8,
+            markersize=5,
+            **scenario_styles.get(scenario, {"color": "#111111", "marker": "o", "linestyle": "-"}),
             label=scenario_names.get(scenario, scenario),
         )
     ax.set_title("Задержка p95 по сценариям и размеру нагрузки")
     ax.set_xlabel("команд/сообщений в серии")
     ax.set_ylabel("p95, мс")
-    ax.grid(alpha=0.25)
-    ax.legend()
+    ax.grid(alpha=0.22, color="#777777", linewidth=0.5)
+    ax.legend(frameon=False)
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "latency_comparison.png"), dpi=160)
     plt.close(fig)
@@ -626,14 +640,16 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
         ax.plot(
             [row["load"] for row in rows],
             [row["throughput_rps_mean"] for row in rows],
-            marker="o",
+            linewidth=1.8,
+            markersize=5,
+            **scenario_styles.get(scenario, {"color": "#111111", "marker": "o", "linestyle": "-"}),
             label=scenario_names.get(scenario, scenario),
         )
     ax.set_title("Пропускная способность по сценариям и размеру нагрузки")
     ax.set_xlabel("команд/сообщений в серии")
     ax.set_ylabel("запросов/с")
-    ax.grid(alpha=0.25)
-    ax.legend()
+    ax.grid(alpha=0.22, color="#777777", linewidth=0.5)
+    ax.legend(frameon=False)
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "throughput_comparison.png"), dpi=160)
     plt.close(fig)

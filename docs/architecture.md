@@ -86,4 +86,4 @@ Endpoint `/player?cache=true` сначала читает Redis, затем Post
 - Redis Streams должен сохранять replay-события для WebSocket reconnect.
 - Redis Pub/Sub не должен рассматриваться как durable event log.
 - Saga должна иметь явно наблюдаемый успешный и компенсированный исход.
-- Stale cache должен обнаруживаться автоматической проверкой.
+- Stale cache должен обнаруживаться отдельным проверочным сценарием.
