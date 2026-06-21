@@ -855,7 +855,7 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
     angles = np.linspace(0, 2 * np.pi, len(criteria), endpoint=False).tolist()
     angles += angles[:1]
 
-    fig, ax = plt.subplots(figsize=(8.8, 8.2), subplot_kw={"projection": "polar"})
+    fig, ax = plt.subplots(figsize=(9.2, 8.6), subplot_kw={"projection": "polar"})
     ax.set_theta_offset(np.pi / 2)
     ax.set_theta_direction(-1)
     ax.set_ylim(1, 5)
@@ -863,10 +863,37 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
     ax.set_yticklabels(["1", "2", "3", "4", "5"], color=palette["muted"], fontsize=8)
     ax.set_rlabel_position(90)
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels([label for _, label in criteria], fontsize=9, color=palette["text"])
+    ax.set_xticklabels([])
+    ax.tick_params(axis="x", length=0, pad=0)
     ax.grid(color=palette["grid"], linewidth=0.8)
     ax.spines["polar"].set_color(palette["border"])
-    ax.set_title("Профиль критериев ключевых архитектурных решений", pad=26, fontsize=13)
+    ax.set_title("Профиль критериев ключевых архитектурных решений", pad=42, fontsize=13)
+
+    label_layout = [
+        {"ha": "center", "va": "bottom", "radius": 5.12},
+        {"ha": "left", "va": "center", "radius": 5.48},
+        {"ha": "left", "va": "center", "radius": 5.50},
+        {"ha": "center", "va": "top", "radius": 5.14},
+        {"ha": "right", "va": "center", "radius": 5.50},
+        {"ha": "right", "va": "center", "radius": 5.48},
+    ]
+    for angle, (_, label), layout in zip(angles[:-1], criteria, label_layout):
+        ax.text(
+            angle,
+            layout["radius"],
+            label,
+            ha=layout["ha"],
+            va=layout["va"],
+            fontsize=9,
+            color=palette["text"],
+            clip_on=False,
+            bbox={
+                "boxstyle": "round,pad=0.12",
+                "facecolor": "white",
+                "edgecolor": "none",
+                "alpha": 0.92,
+            },
+        )
 
     for solution, label, color in selected:
         row = by_solution[solution]
@@ -882,7 +909,7 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
         frameon=False,
         fontsize=8,
     )
-    fig.subplots_adjust(top=0.86, bottom=0.20, left=0.08, right=0.92)
+    fig.subplots_adjust(top=0.80, bottom=0.22, left=0.16, right=0.84)
     fig.savefig(os.path.join(out_dir, "criteria_radar.png"), dpi=160)
     plt.close(fig)
 
