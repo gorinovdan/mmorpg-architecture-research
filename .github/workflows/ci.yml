@@ -1,0 +1,36 @@
+name: research-stand-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Unit tests and static checks
+        run: make test
+      - name: Docker smoke experiment
+        run: |
+          make up
+          for i in $(seq 1 60); do
+            curl -fsS http://localhost:18080/health && break
+            sleep 1
+          done
+          make experiment
+          make verify-results
+      - name: Upload experiment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-results
+          path: results/latest
+      - name: Stop services
+        if: always()
+        run: make down
