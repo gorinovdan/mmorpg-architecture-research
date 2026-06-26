@@ -19,7 +19,12 @@ LOAD_SIZES = [100, 500, 1000]
 REPEATS = 5
 SCENARIO_SYNC = "Синхронная транзакция"
 SCENARIO_OUTBOX = "Outbox-транзакция"
-SCENARIO_CHAT = "Чатовая рассылка"
+SCENARIO_CHAT = "Доставка сообщений чата через Pub/Sub"
+SCENARIO_DISPLAY_LABELS = {
+    SCENARIO_SYNC: "Синхронная транзакция",
+    SCENARIO_OUTBOX: "Outbox-транзакция",
+    SCENARIO_CHAT: "Доставка сообщений\nчата через Pub/Sub",
+}
 GRAPH_FILES = [
     "latency_comparison.png",
     "throughput_comparison.png",
@@ -308,7 +313,7 @@ def build_comparison_matrix(aggregates, faults, final_metrics):
             "operational_cost": 4,
             "observability": 3,
             "evidence": f"синхронная транзакция, нагрузка=1000: p95={sync_p95:.3f} мс, пропускная способность={sync_thr:.2f} запросов/с",
-            "conclusion": "подходит для изменения критичного состояния, но не решает рассылку событий",
+            "conclusion": "подходит для изменения критичного состояния, но не решает доставку событий клиентам",
         },
         {
             "solution": "Transactional Outbox",
@@ -352,7 +357,7 @@ def build_comparison_matrix(aggregates, faults, final_metrics):
             "operational_cost": 4,
             "observability": 2,
             "evidence": f"доставка позднему подписчику={faults['pubsub_loss']['delivered_to_late_subscriber']}",
-            "conclusion": "пригоден для оперативной рассылки, но не для гарантированной доставки критичного состояния",
+            "conclusion": "пригоден для оперативной доставки активным подписчикам, но не для гарантированной доставки критичного состояния",
         },
         {
             "solution": "WebSocket-шлюз",
@@ -388,15 +393,15 @@ def build_comparison_matrix(aggregates, faults, final_metrics):
             "conclusion": "ускоряет чтение, но не может быть основанием критичных игровых решений",
         },
         {
-            "solution": "Чатовая рассылка",
+            "solution": SCENARIO_CHAT,
             "scalability": score_from_threshold(chat_thr, 650, 350),
             "reliability": 4,
             "performance": score_from_threshold(chat_p95, 5, 15, reverse=True),
             "implementation_complexity": 4,
             "operational_cost": 4,
             "observability": 4,
-            "evidence": f"чатовая рассылка, нагрузка=1000: p95={chat_p95:.3f} мс, пропускная способность={chat_thr:.2f} запросов/с, chat_stream_len={final_metrics['chat_stream_len']}",
-            "conclusion": "подходит для массовых сообщений при разделении Pub/Sub и сохраняемого журнала",
+            "evidence": f"доставка сообщений чата через Pub/Sub, нагрузка=1000: p95={chat_p95:.3f} мс, пропускная способность={chat_thr:.2f} запросов/с, chat_stream_len={final_metrics['chat_stream_len']}",
+            "conclusion": "подходит для оперативной доставки массовых чат-сообщений при сочетании Pub/Sub и сохраняемого журнала",
         },
     ]
     for row in rows:
@@ -430,11 +435,11 @@ def build_evidence_trace(aggregates, faults, matrix, final_metrics):
     return [
         {
             "criterion": "Масштабируемость",
-            "scenario": "серии 100/500/1000 для синхронной транзакции, Outbox-транзакции и чатовой рассылки",
+            "scenario": "серии 100/500/1000 для синхронной транзакции, Outbox-транзакции и доставки сообщений чата через Pub/Sub",
             "metric": "средняя пропускная способность и средняя доля ошибок",
             "artifact": "scenario_runs.csv, throughput_comparison.png",
             "result": "серии выполнены без ошибок; пропускная способность зафиксирована для каждого класса обработки",
-            "conclusion": "масштабируемые каналы нужны прежде всего для рассылки и фоновой обработки событий",
+            "conclusion": "масштабируемые каналы нужны прежде всего для доставки сообщений активным клиентам и фоновой обработки событий",
         },
         {
             "criterion": "Надёжность",
@@ -446,7 +451,7 @@ def build_evidence_trace(aggregates, faults, matrix, final_metrics):
         },
         {
             "criterion": "Производительность",
-            "scenario": "серии задержки и пропускной способности для синхронной транзакции, Outbox-транзакции и чатовой рассылки",
+            "scenario": "серии задержки и пропускной способности для синхронной транзакции, Outbox-транзакции и доставки сообщений чата через Pub/Sub",
             "metric": "p50/p95/p99 задержки, пропускная способность",
             "artifact": "latency_comparison.png, throughput_comparison.png",
             "result": "локальные p95 и p99 измерены для каждого размера нагрузки и повторения",
@@ -501,7 +506,7 @@ def build_recommendations(faults, final_metrics):
         },
         {
             "id": "R4",
-            "recommendation": "Redis Pub/Sub использовать только для краткоживущей рассылки, а Redis Streams — для повторного чтения и контролируемой доставки.",
+            "recommendation": "Redis Pub/Sub использовать только для краткоживущей доставки активным подписчикам, а Redis Streams — для повторного чтения и контролируемой доставки.",
             "evidence": "потеря Pub/Sub-сообщения, WebSocket-восстановление",
             "reason": f"доставка позднему подписчику={faults['pubsub_loss']['delivered_to_late_subscriber']}; WebSocket-восстановление получило {faults['websocket_replay']['received']} события.",
         },
@@ -637,7 +642,7 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
             linewidth=2.4,
             markersize=6.5,
             **scenario_styles.get(scenario, {"color": "#111111", "marker": "o", "linestyle": "-"}),
-            label=scenario,
+            label=SCENARIO_DISPLAY_LABELS.get(scenario, scenario),
         )
     ax.set_title("Задержка p95 по сценариям и размеру нагрузки")
     ax.set_xlabel("команд/сообщений в серии")
@@ -657,7 +662,7 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
             linewidth=2.4,
             markersize=6.5,
             **scenario_styles.get(scenario, {"color": "#111111", "marker": "o", "linestyle": "-"}),
-            label=scenario,
+            label=SCENARIO_DISPLAY_LABELS.get(scenario, scenario),
         )
     ax.set_title("Пропускная способность по сценариям и размеру нагрузки")
     ax.set_xlabel("команд/сообщений в серии")
