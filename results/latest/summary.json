@@ -1,6 +1,6 @@
 {
   "seed": 4116,
-  "started_at": "2026-06-21T15:32:55Z",
+  "started_at": "2026-06-26T15:56:58Z",
   "load_sizes": [
     100,
     500,
@@ -9,102 +9,102 @@
   "repeats": 5,
   "performance_series": [
     {
-      "scenario": "chat_fanout",
+      "scenario": "Outbox-транзакция",
       "load": 100,
       "repeats": 5,
       "count_total": 500,
-      "p50_ms_mean": 0.3136,
-      "p95_ms_mean": 0.6054799999999999,
-      "p99_ms_mean": 0.9456900000000028,
-      "throughput_rps_mean": 762.3162200178456,
+      "p50_ms_mean": 0.6128,
+      "p95_ms_mean": 0.9374399999999999,
+      "p99_ms_mean": 1.2227540000000057,
+      "throughput_rps_mean": 584.07880055588,
       "error_rate_mean": 0.0
     },
     {
-      "scenario": "chat_fanout",
+      "scenario": "Outbox-транзакция",
       "load": 500,
       "repeats": 5,
       "count_total": 2500,
-      "p50_ms_mean": 0.275,
-      "p95_ms_mean": 0.5008599999999997,
-      "p99_ms_mean": 0.8430639999999997,
-      "throughput_rps_mean": 911.6146514411261,
+      "p50_ms_mean": 0.6064,
+      "p95_ms_mean": 1.0586199999999995,
+      "p99_ms_mean": 1.733855999999999,
+      "throughput_rps_mean": 564.7415157443847,
       "error_rate_mean": 0.0
     },
     {
-      "scenario": "chat_fanout",
+      "scenario": "Outbox-транзакция",
       "load": 1000,
       "repeats": 5,
       "count_total": 5000,
-      "p50_ms_mean": 0.26580000000000004,
-      "p95_ms_mean": 0.46144999999999997,
-      "p99_ms_mean": 0.6577299999999998,
-      "throughput_rps_mean": 965.9981300032803,
+      "p50_ms_mean": 0.7596999999999999,
+      "p95_ms_mean": 1.2025399999999997,
+      "p99_ms_mean": 1.7499119999999995,
+      "throughput_rps_mean": 465.78203504855946,
       "error_rate_mean": 0.0
     },
     {
-      "scenario": "outbox_transaction",
+      "scenario": "Синхронная транзакция",
       "load": 100,
       "repeats": 5,
       "count_total": 500,
-      "p50_ms_mean": 0.4701000000000001,
-      "p95_ms_mean": 0.8318899999999999,
-      "p99_ms_mean": 0.9645620000000015,
-      "throughput_rps_mean": 741.0483179431725,
+      "p50_ms_mean": 0.5711,
+      "p95_ms_mean": 0.9557599999999999,
+      "p99_ms_mean": 1.3685140000000025,
+      "throughput_rps_mean": 584.737534578676,
       "error_rate_mean": 0.0
     },
     {
-      "scenario": "outbox_transaction",
+      "scenario": "Синхронная транзакция",
       "load": 500,
       "repeats": 5,
       "count_total": 2500,
-      "p50_ms_mean": 0.45289999999999997,
-      "p95_ms_mean": 0.7554999999999998,
-      "p99_ms_mean": 1.026225999999999,
-      "throughput_rps_mean": 737.1526806764584,
+      "p50_ms_mean": 0.5285,
+      "p95_ms_mean": 0.8768099999999999,
+      "p99_ms_mean": 1.2433059999999985,
+      "throughput_rps_mean": 583.8626091399209,
       "error_rate_mean": 0.0
     },
     {
-      "scenario": "outbox_transaction",
+      "scenario": "Синхронная транзакция",
       "load": 1000,
       "repeats": 5,
       "count_total": 5000,
-      "p50_ms_mean": 0.45289999999999997,
-      "p95_ms_mean": 0.7673399999999998,
-      "p99_ms_mean": 1.1799499999999994,
-      "throughput_rps_mean": 755.6528466445191,
+      "p50_ms_mean": 0.6408,
+      "p95_ms_mean": 1.0987699999999998,
+      "p99_ms_mean": 1.7477019999999996,
+      "throughput_rps_mean": 508.99309276624433,
       "error_rate_mean": 0.0
     },
     {
-      "scenario": "sync_transaction",
+      "scenario": "Чатовая рассылка",
       "load": 100,
       "repeats": 5,
       "count_total": 500,
-      "p50_ms_mean": 0.44830000000000003,
-      "p95_ms_mean": 1.1078199999999998,
-      "p99_ms_mean": 1.734880000000004,
-      "throughput_rps_mean": 682.9734561663558,
+      "p50_ms_mean": 0.5455,
+      "p95_ms_mean": 1.00071,
+      "p99_ms_mean": 1.508394000000006,
+      "throughput_rps_mean": 514.164023383524,
       "error_rate_mean": 0.0
     },
     {
-      "scenario": "sync_transaction",
+      "scenario": "Чатовая рассылка",
       "load": 500,
       "repeats": 5,
       "count_total": 2500,
-      "p50_ms_mean": 0.3788,
-      "p95_ms_mean": 0.6054599999999997,
-      "p99_ms_mean": 1.1498199999999983,
-      "throughput_rps_mean": 845.7156626692067,
+      "p50_ms_mean": 0.3708,
+      "p95_ms_mean": 0.6972199999999995,
+      "p99_ms_mean": 1.0553719999999993,
+      "throughput_rps_mean": 673.8926518352768,
       "error_rate_mean": 0.0
     },
     {
-      "scenario": "sync_transaction",
+      "scenario": "Чатовая рассылка",
       "load": 1000,
       "repeats": 5,
       "count_total": 5000,
-      "p50_ms_mean": 0.37320000000000003,
-      "p95_ms_mean": 0.6023099999999999,
-      "p99_ms_mean": 0.8161599999999997,
-      "throughput_rps_mean": 858.6703567178777,
+      "p50_ms_mean": 0.4295,
+      "p95_ms_mean": 0.8753099999999993,
+      "p99_ms_mean": 1.7196719999999979,
+      "throughput_rps_mean": 599.3718929042582,
       "error_rate_mean": 0.0
     }
   ],
@@ -132,13 +132,13 @@
     },
     "saga": {
       "submit_latency_ms": [
-        4.163,
-        1.474
+        1.454,
+        0.616
       ],
       "saga_completed": 1,
       "saga_compensated": 1,
-      "saga_duration_avg_ms": 19.8945,
-      "saga_duration_p95_ms": 22.36995
+      "saga_duration_avg_ms": 22.0655,
+      "saga_duration_p95_ms": 23.32505
     },
     "websocket_replay": {
       "received": 3
@@ -158,44 +158,44 @@
     "redis_unique_events": 8004,
     "saga_compensated": 1,
     "saga_completed": 1,
-    "saga_duration_avg_ms": 19.8945,
-    "saga_duration_p95_ms": 22.36995,
+    "saga_duration_avg_ms": 22.0655,
+    "saga_duration_p95_ms": 23.32505,
     "transport_duplicate_observed": true
   },
   "comparison_matrix": [
     {
-      "solution": "PostgreSQL synchronous transaction",
-      "scalability": 5,
+      "solution": "Синхронная транзакция PostgreSQL",
+      "scalability": 4,
       "reliability": 4,
       "performance": 5,
       "implementation_complexity": 4,
       "operational_cost": 4,
       "observability": 3,
-      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps",
-      "conclusion": "подходит как source of truth для критичного состояния, но не решает fan-out событий",
-      "score_total": 4.17
+      "evidence": "синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с",
+      "conclusion": "подходит для изменения критичного состояния, но не решает рассылку событий",
+      "score_total": 4.0
     },
     {
       "solution": "Transactional Outbox",
-      "scalability": 5,
+      "scalability": 4,
       "reliability": 5,
       "performance": 5,
       "implementation_complexity": 3,
       "operational_cost": 3,
       "observability": 5,
-      "evidence": "outbox load=1000: p95=0.767 ms; pending=0",
-      "conclusion": "обеспечивает восстановимую публикацию после commit при наличии worker и метрик backlog",
-      "score_total": 4.33
+      "evidence": "Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0",
+      "conclusion": "обеспечивает восстановимую публикацию после фиксации транзакции при наличии фонового обработчика и метрик очереди",
+      "score_total": 4.17
     },
     {
-      "solution": "Inbox/idempotency",
+      "solution": "Inbox и идемпотентность",
       "scalability": 5,
       "reliability": 5,
       "performance": 5,
       "implementation_complexity": 4,
       "operational_cost": 5,
       "observability": 4,
-      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7",
+      "evidence": "5 повторов callback -> 4 дубля, итоговый баланс=7",
       "conclusion": "предотвращает повторный бизнес-эффект при повторной доставке",
       "score_total": 4.67
     },
@@ -207,8 +207,8 @@
       "implementation_complexity": 3,
       "operational_cost": 3,
       "observability": 5,
-      "evidence": "stream_len=8005, replay_received=3",
-      "conclusion": "подходит для replay и контролируемой доставки, но требует политики хранения",
+      "evidence": "длина журнала=8005, повторно получено=3",
+      "conclusion": "подходит для повторного чтения и контролируемой доставки, но требует политики хранения",
       "score_total": 4.17
     },
     {
@@ -219,32 +219,32 @@
       "implementation_complexity": 5,
       "operational_cost": 4,
       "observability": 2,
-      "evidence": "late subscriber delivered=False",
-      "conclusion": "пригоден для live fan-out, но не для durable-доставки критичного состояния",
+      "evidence": "доставка позднему подписчику=False",
+      "conclusion": "пригоден для оперативной рассылки, но не для гарантированной доставки критичного состояния",
       "score_total": 3.83
     },
     {
-      "solution": "WebSocket gateway",
+      "solution": "WebSocket-шлюз",
       "scalability": 4,
       "reliability": 4,
       "performance": 4,
       "implementation_complexity": 3,
       "operational_cost": 3,
       "observability": 4,
-      "evidence": "WebSocket replay received=3",
-      "conclusion": "нужен для realtime-доставки, но восстановление должно опираться на persisted stream",
+      "evidence": "WebSocket-восстановление: получено=3",
+      "conclusion": "нужен для доставки в реальном времени, но восстановление должно опираться на сохраняемый журнал",
       "score_total": 3.67
     },
     {
-      "solution": "Saga orchestration",
+      "solution": "Saga-оркестрация",
       "scalability": 3,
       "reliability": 5,
       "performance": 3,
       "implementation_complexity": 2,
       "operational_cost": 2,
       "observability": 5,
-      "evidence": "completed=1, compensated=1, p95=22.370 ms",
-      "conclusion": "подходит для долгих экономических цепочек с явными компенсациями",
+      "evidence": "завершено=1, компенсировано=1, p95=23.325 мс",
+      "conclusion": "подходит для долгих игровых экономических цепочек с явными компенсациями",
       "score_total": 3.33
     },
     {
@@ -255,433 +255,433 @@
       "implementation_complexity": 4,
       "operational_cost": 4,
       "observability": 3,
-      "evidence": "cached=100, actual=150, stale=True",
-      "conclusion": "ускоряет чтение, но не может быть основанием для экономических решений",
+      "evidence": "кэш=100, актуально=150, устарело=True",
+      "conclusion": "ускоряет чтение, но не может быть основанием критичных игровых решений",
       "score_total": 3.83
     },
     {
-      "solution": "Chat event fan-out",
-      "scalability": 5,
+      "solution": "Чатовая рассылка",
+      "scalability": 4,
       "reliability": 4,
       "performance": 5,
       "implementation_complexity": 4,
       "operational_cost": 4,
       "observability": 4,
-      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000",
-      "conclusion": "подходит для массовых сообщений при разделении transient Pub/Sub и stream history",
-      "score_total": 4.33
+      "evidence": "чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000",
+      "conclusion": "подходит для массовых сообщений при разделении Pub/Sub и сохраняемого журнала",
+      "score_total": 4.17
     }
   ],
   "criteria_scores": [
     {
       "criterion": "scalability",
-      "solution": "PostgreSQL synchronous transaction",
-      "score": 5,
-      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+      "solution": "Синхронная транзакция PostgreSQL",
+      "score": 4,
+      "evidence": "синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
     },
     {
       "criterion": "reliability",
-      "solution": "PostgreSQL synchronous transaction",
+      "solution": "Синхронная транзакция PostgreSQL",
       "score": 4,
-      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+      "evidence": "синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
     },
     {
       "criterion": "performance",
-      "solution": "PostgreSQL synchronous transaction",
+      "solution": "Синхронная транзакция PostgreSQL",
       "score": 5,
-      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+      "evidence": "синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
     },
     {
       "criterion": "implementation_complexity",
-      "solution": "PostgreSQL synchronous transaction",
+      "solution": "Синхронная транзакция PostgreSQL",
       "score": 4,
-      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+      "evidence": "синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
     },
     {
       "criterion": "operational_cost",
-      "solution": "PostgreSQL synchronous transaction",
+      "solution": "Синхронная транзакция PostgreSQL",
       "score": 4,
-      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+      "evidence": "синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
     },
     {
       "criterion": "observability",
-      "solution": "PostgreSQL synchronous transaction",
+      "solution": "Синхронная транзакция PostgreSQL",
       "score": 3,
-      "evidence": "sync load=1000: p95=0.602 ms, throughput=858.67 rps"
+      "evidence": "синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
     },
     {
       "criterion": "scalability",
       "solution": "Transactional Outbox",
-      "score": 5,
-      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+      "score": 4,
+      "evidence": "Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
     },
     {
       "criterion": "reliability",
       "solution": "Transactional Outbox",
       "score": 5,
-      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+      "evidence": "Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
     },
     {
       "criterion": "performance",
       "solution": "Transactional Outbox",
       "score": 5,
-      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+      "evidence": "Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
     },
     {
       "criterion": "implementation_complexity",
       "solution": "Transactional Outbox",
       "score": 3,
-      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+      "evidence": "Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
     },
     {
       "criterion": "operational_cost",
       "solution": "Transactional Outbox",
       "score": 3,
-      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+      "evidence": "Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
     },
     {
       "criterion": "observability",
       "solution": "Transactional Outbox",
       "score": 5,
-      "evidence": "outbox load=1000: p95=0.767 ms; pending=0"
+      "evidence": "Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
     },
     {
       "criterion": "scalability",
-      "solution": "Inbox/idempotency",
+      "solution": "Inbox и идемпотентность",
       "score": 5,
-      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+      "evidence": "5 повторов callback -> 4 дубля, итоговый баланс=7"
     },
     {
       "criterion": "reliability",
-      "solution": "Inbox/idempotency",
+      "solution": "Inbox и идемпотентность",
       "score": 5,
-      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+      "evidence": "5 повторов callback -> 4 дубля, итоговый баланс=7"
     },
     {
       "criterion": "performance",
-      "solution": "Inbox/idempotency",
+      "solution": "Inbox и идемпотентность",
       "score": 5,
-      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+      "evidence": "5 повторов callback -> 4 дубля, итоговый баланс=7"
     },
     {
       "criterion": "implementation_complexity",
-      "solution": "Inbox/idempotency",
+      "solution": "Inbox и идемпотентность",
       "score": 4,
-      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+      "evidence": "5 повторов callback -> 4 дубля, итоговый баланс=7"
     },
     {
       "criterion": "operational_cost",
-      "solution": "Inbox/idempotency",
+      "solution": "Inbox и идемпотентность",
       "score": 5,
-      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+      "evidence": "5 повторов callback -> 4 дубля, итоговый баланс=7"
     },
     {
       "criterion": "observability",
-      "solution": "Inbox/idempotency",
+      "solution": "Inbox и идемпотентность",
       "score": 4,
-      "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7"
+      "evidence": "5 повторов callback -> 4 дубля, итоговый баланс=7"
     },
     {
       "criterion": "scalability",
       "solution": "Redis Streams",
       "score": 5,
-      "evidence": "stream_len=8005, replay_received=3"
+      "evidence": "длина журнала=8005, повторно получено=3"
     },
     {
       "criterion": "reliability",
       "solution": "Redis Streams",
       "score": 5,
-      "evidence": "stream_len=8005, replay_received=3"
+      "evidence": "длина журнала=8005, повторно получено=3"
     },
     {
       "criterion": "performance",
       "solution": "Redis Streams",
       "score": 4,
-      "evidence": "stream_len=8005, replay_received=3"
+      "evidence": "длина журнала=8005, повторно получено=3"
     },
     {
       "criterion": "implementation_complexity",
       "solution": "Redis Streams",
       "score": 3,
-      "evidence": "stream_len=8005, replay_received=3"
+      "evidence": "длина журнала=8005, повторно получено=3"
     },
     {
       "criterion": "operational_cost",
       "solution": "Redis Streams",
       "score": 3,
-      "evidence": "stream_len=8005, replay_received=3"
+      "evidence": "длина журнала=8005, повторно получено=3"
     },
     {
       "criterion": "observability",
       "solution": "Redis Streams",
       "score": 5,
-      "evidence": "stream_len=8005, replay_received=3"
+      "evidence": "длина журнала=8005, повторно получено=3"
     },
     {
       "criterion": "scalability",
       "solution": "Redis Pub/Sub",
       "score": 5,
-      "evidence": "late subscriber delivered=False"
+      "evidence": "доставка позднему подписчику=False"
     },
     {
       "criterion": "reliability",
-      "solution": "Redis Pub/Sub",
-      "score": 2,
-      "evidence": "late subscriber delivered=False"
-    },
-    {
-      "criterion": "performance",
-      "solution": "Redis Pub/Sub",
-      "score": 5,
-      "evidence": "late subscriber delivered=False"
-    },
-    {
-      "criterion": "implementation_complexity",
-      "solution": "Redis Pub/Sub",
-      "score": 5,
-      "evidence": "late subscriber delivered=False"
-    },
-    {
-      "criterion": "operational_cost",
-      "solution": "Redis Pub/Sub",
-      "score": 4,
-      "evidence": "late subscriber delivered=False"
-    },
-    {
-      "criterion": "observability",
       "solution": "Redis Pub/Sub",
       "score": 2,
-      "evidence": "late subscriber delivered=False"
-    },
-    {
-      "criterion": "scalability",
-      "solution": "WebSocket gateway",
-      "score": 4,
-      "evidence": "WebSocket replay received=3"
-    },
-    {
-      "criterion": "reliability",
-      "solution": "WebSocket gateway",
-      "score": 4,
-      "evidence": "WebSocket replay received=3"
+      "evidence": "доставка позднему подписчику=False"
     },
     {
       "criterion": "performance",
-      "solution": "WebSocket gateway",
-      "score": 4,
-      "evidence": "WebSocket replay received=3"
+      "solution": "Redis Pub/Sub",
+      "score": 5,
+      "evidence": "доставка позднему подписчику=False"
     },
     {
       "criterion": "implementation_complexity",
-      "solution": "WebSocket gateway",
-      "score": 3,
-      "evidence": "WebSocket replay received=3"
+      "solution": "Redis Pub/Sub",
+      "score": 5,
+      "evidence": "доставка позднему подписчику=False"
     },
     {
       "criterion": "operational_cost",
-      "solution": "WebSocket gateway",
-      "score": 3,
-      "evidence": "WebSocket replay received=3"
+      "solution": "Redis Pub/Sub",
+      "score": 4,
+      "evidence": "доставка позднему подписчику=False"
     },
     {
       "criterion": "observability",
-      "solution": "WebSocket gateway",
-      "score": 4,
-      "evidence": "WebSocket replay received=3"
-    },
-    {
-      "criterion": "scalability",
-      "solution": "Saga orchestration",
-      "score": 3,
-      "evidence": "completed=1, compensated=1, p95=22.370 ms"
-    },
-    {
-      "criterion": "reliability",
-      "solution": "Saga orchestration",
-      "score": 5,
-      "evidence": "completed=1, compensated=1, p95=22.370 ms"
-    },
-    {
-      "criterion": "performance",
-      "solution": "Saga orchestration",
-      "score": 3,
-      "evidence": "completed=1, compensated=1, p95=22.370 ms"
-    },
-    {
-      "criterion": "implementation_complexity",
-      "solution": "Saga orchestration",
+      "solution": "Redis Pub/Sub",
       "score": 2,
-      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+      "evidence": "доставка позднему подписчику=False"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "WebSocket-шлюз",
+      "score": 4,
+      "evidence": "WebSocket-восстановление: получено=3"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "WebSocket-шлюз",
+      "score": 4,
+      "evidence": "WebSocket-восстановление: получено=3"
+    },
+    {
+      "criterion": "performance",
+      "solution": "WebSocket-шлюз",
+      "score": 4,
+      "evidence": "WebSocket-восстановление: получено=3"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "WebSocket-шлюз",
+      "score": 3,
+      "evidence": "WebSocket-восстановление: получено=3"
     },
     {
       "criterion": "operational_cost",
-      "solution": "Saga orchestration",
-      "score": 2,
-      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+      "solution": "WebSocket-шлюз",
+      "score": 3,
+      "evidence": "WebSocket-восстановление: получено=3"
     },
     {
       "criterion": "observability",
-      "solution": "Saga orchestration",
+      "solution": "WebSocket-шлюз",
+      "score": 4,
+      "evidence": "WebSocket-восстановление: получено=3"
+    },
+    {
+      "criterion": "scalability",
+      "solution": "Saga-оркестрация",
+      "score": 3,
+      "evidence": "завершено=1, компенсировано=1, p95=23.325 мс"
+    },
+    {
+      "criterion": "reliability",
+      "solution": "Saga-оркестрация",
       "score": 5,
-      "evidence": "completed=1, compensated=1, p95=22.370 ms"
+      "evidence": "завершено=1, компенсировано=1, p95=23.325 мс"
+    },
+    {
+      "criterion": "performance",
+      "solution": "Saga-оркестрация",
+      "score": 3,
+      "evidence": "завершено=1, компенсировано=1, p95=23.325 мс"
+    },
+    {
+      "criterion": "implementation_complexity",
+      "solution": "Saga-оркестрация",
+      "score": 2,
+      "evidence": "завершено=1, компенсировано=1, p95=23.325 мс"
+    },
+    {
+      "criterion": "operational_cost",
+      "solution": "Saga-оркестрация",
+      "score": 2,
+      "evidence": "завершено=1, компенсировано=1, p95=23.325 мс"
+    },
+    {
+      "criterion": "observability",
+      "solution": "Saga-оркестрация",
+      "score": 5,
+      "evidence": "завершено=1, компенсировано=1, p95=23.325 мс"
     },
     {
       "criterion": "scalability",
       "solution": "Cache-aside",
       "score": 5,
-      "evidence": "cached=100, actual=150, stale=True"
+      "evidence": "кэш=100, актуально=150, устарело=True"
     },
     {
       "criterion": "reliability",
       "solution": "Cache-aside",
       "score": 2,
-      "evidence": "cached=100, actual=150, stale=True"
+      "evidence": "кэш=100, актуально=150, устарело=True"
     },
     {
       "criterion": "performance",
       "solution": "Cache-aside",
       "score": 5,
-      "evidence": "cached=100, actual=150, stale=True"
+      "evidence": "кэш=100, актуально=150, устарело=True"
     },
     {
       "criterion": "implementation_complexity",
       "solution": "Cache-aside",
       "score": 4,
-      "evidence": "cached=100, actual=150, stale=True"
+      "evidence": "кэш=100, актуально=150, устарело=True"
     },
     {
       "criterion": "operational_cost",
       "solution": "Cache-aside",
       "score": 4,
-      "evidence": "cached=100, actual=150, stale=True"
+      "evidence": "кэш=100, актуально=150, устарело=True"
     },
     {
       "criterion": "observability",
       "solution": "Cache-aside",
       "score": 3,
-      "evidence": "cached=100, actual=150, stale=True"
+      "evidence": "кэш=100, актуально=150, устарело=True"
     },
     {
       "criterion": "scalability",
-      "solution": "Chat event fan-out",
-      "score": 5,
-      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+      "solution": "Чатовая рассылка",
+      "score": 4,
+      "evidence": "чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
     },
     {
       "criterion": "reliability",
-      "solution": "Chat event fan-out",
+      "solution": "Чатовая рассылка",
       "score": 4,
-      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+      "evidence": "чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
     },
     {
       "criterion": "performance",
-      "solution": "Chat event fan-out",
+      "solution": "Чатовая рассылка",
       "score": 5,
-      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+      "evidence": "чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
     },
     {
       "criterion": "implementation_complexity",
-      "solution": "Chat event fan-out",
+      "solution": "Чатовая рассылка",
       "score": 4,
-      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+      "evidence": "чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
     },
     {
       "criterion": "operational_cost",
-      "solution": "Chat event fan-out",
+      "solution": "Чатовая рассылка",
       "score": 4,
-      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+      "evidence": "чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
     },
     {
       "criterion": "observability",
-      "solution": "Chat event fan-out",
+      "solution": "Чатовая рассылка",
       "score": 4,
-      "evidence": "chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+      "evidence": "чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
     }
   ],
   "evidence_trace": [
     {
       "criterion": "Масштабируемость",
-      "scenario": "load series 100/500/1000 for sync/outbox/chat",
-      "metric": "throughput_rps_mean and error_rate_mean",
+      "scenario": "серии 100/500/1000 для синхронной транзакции, Outbox-транзакции и чатовой рассылки",
+      "metric": "средняя пропускная способность и средняя доля ошибок",
       "artifact": "scenario_runs.csv, throughput_comparison.png",
-      "result": "серии выполнены без ошибок; throughput зафиксирован для каждого класса обработки",
-      "conclusion": "горизонтально масштабируемые каналы нужны прежде всего для fan-out и worker-обработки событий"
+      "result": "серии выполнены без ошибок; пропускная способность зафиксирована для каждого класса обработки",
+      "conclusion": "масштабируемые каналы нужны прежде всего для рассылки и фоновой обработки событий"
     },
     {
       "criterion": "Надёжность",
-      "scenario": "duplicate callback, publish-no-ack, Pub/Sub loss, WebSocket replay, stale cache, Saga",
-      "metric": "duplicates_reported, redis_duplicate_events, delivered_to_late_subscriber, stale, saga_completed/compensated",
+      "scenario": "повторный callback, сбой после публикации, потеря Pub/Sub-сообщения, WebSocket-восстановление, устаревшее чтение кэша, Saga",
+      "metric": "дубли, транспортные дубли Redis, доставка позднему подписчику, признак устаревшего значения, завершение/компенсация Saga",
       "artifact": "summary.json, reliability_matrix.png",
-      "result": "duplicates=4; stream_duplicates=1; pubsub_late=False",
-      "conclusion": "надёжность достигается комбинацией Outbox, Inbox, Streams, Saga и source of truth"
+      "result": "дубли=4; дубли Redis=1; доставка позднему подписчику=False",
+      "conclusion": "надёжность достигается комбинацией Outbox, Inbox, Streams, Saga и достоверного состояния в PostgreSQL"
     },
     {
       "criterion": "Производительность",
-      "scenario": "sync/outbox/chat latency and throughput series",
-      "metric": "p50/p95/p99 latency, throughput",
+      "scenario": "серии задержки и пропускной способности для синхронной транзакции, Outbox-транзакции и чатовой рассылки",
+      "metric": "p50/p95/p99 задержки, пропускная способность",
       "artifact": "latency_comparison.png, throughput_comparison.png",
       "result": "локальные p95 и p99 измерены для каждого размера нагрузки и повторения",
-      "conclusion": "Outbox не должен трактоваться как бесплатный механизм: его overhead приемлем только при контроле backlog"
+      "conclusion": "Outbox не должен трактоваться как бесплатный механизм: его накладные расходы приемлемы только при контроле очереди"
     },
     {
       "criterion": "Сложность внедрения",
-      "scenario": "implemented components and state machines",
-      "metric": "component/state/contract count, Saga states, worker path",
+      "scenario": "реализованные компоненты и автоматы состояний",
+      "metric": "число компонентов, состояний и контрактов; состояния Saga; путь фоновой обработки",
       "artifact": "comparison_matrix.csv",
-      "result": "наибольшую сложность имеют Saga orchestration, WebSocket gateway и Outbox worker",
+      "result": "наибольшую сложность имеют Saga-оркестрация, WebSocket-шлюз и фоновый обработчик Outbox",
       "conclusion": "сложные паттерны следует применять только для сценариев, где простая транзакция не закрывает риск"
     },
     {
       "criterion": "Стоимость эксплуатации",
-      "scenario": "stateful dependencies and retained history",
-      "metric": "PostgreSQL, Redis, worker, stream length, outbox attempts",
+      "scenario": "зависимости с собственным состоянием и сохраняемая история",
+      "metric": "PostgreSQL, Redis, фоновый обработчик, длина журнала Redis Streams, попытки Outbox",
       "artifact": "comparison_matrix.csv, outbox_backlog.png",
-      "result": "stream_len=8005; outbox_attempts=8005",
-      "conclusion": "эксплуатационная стоимость определяется не только БД, но и политикой хранения stream/outbox и наблюдаемостью worker"
+      "result": "длина журнала=8005; попытки Outbox=8005",
+      "conclusion": "эксплуатационная стоимость определяется не только PostgreSQL, но и политикой хранения Redis Streams/Outbox и наблюдаемостью фоновых обработчиков"
     },
     {
       "criterion": "Наблюдаемость",
-      "scenario": "/metrics/summary and generated artifacts",
-      "metric": "outbox_oldest_pending_ms, stream length, duplicates, saga duration, cache stale",
+      "scenario": "/metrics/summary и сгенерированные артефакты",
+      "metric": "outbox_oldest_pending_ms, длина журнала, дубли, длительность Saga, устаревшее чтение кэша",
       "artifact": "summary.json, evidence_trace.json",
-      "result": "каждая итоговая рекомендация привязана к источнику метрик или fault-сценарию",
+      "result": "каждая итоговая рекомендация привязана к источнику метрик или сценарию внедрения отказа",
       "conclusion": "архитектурная рекомендация считается проверенной только при наличии наблюдаемой метрики"
     }
   ],
   "recommendations": [
     {
       "id": "R1",
-      "recommendation": "PostgreSQL использовать как source of truth для экономики, инвентаря, прогресса и аудита.",
-      "evidence": "sync_transaction series, cache_stale",
-      "reason": "cache stale reproduced: cached=100, actual=150"
+      "recommendation": "Хранить достоверное состояние игровой экономики, инвентаря игрока, прогресса игрока и аудита игровых операций в PostgreSQL.",
+      "evidence": "серии синхронных транзакций, устаревшее чтение кэша",
+      "reason": "воспроизведено устаревшее чтение кэша: кэш=100, актуально=150"
     },
     {
       "id": "R2",
       "recommendation": "Каждую внешнюю команду и callback снабжать idempotency key и фиксировать в Inbox.",
-      "evidence": "duplicate_callback",
+      "evidence": "повторный callback",
       "reason": "5 повторов одной команды дали один бизнес-результат и 4 зарегистрированных дубля."
     },
     {
       "id": "R3",
       "recommendation": "Исходящие доменные события публиковать через Transactional Outbox и идемпотентных потребителей.",
-      "evidence": "publish_no_ack, outbox_delivery series",
-      "reason": "publish-no-ack created duplicate transport event; final outbox_pending=0."
+      "evidence": "сбой после публикации, серия Outbox-доставки",
+      "reason": "сбой после публикации создал транспортный дубль; финальное значение outbox_остаток=0."
     },
     {
       "id": "R4",
-      "recommendation": "Redis Pub/Sub использовать только для transient fan-out, а Redis Streams — для replay и контролируемой доставки.",
-      "evidence": "pubsub_loss, websocket_replay",
-      "reason": "late subscriber delivered=False; ws replay received=3."
+      "recommendation": "Redis Pub/Sub использовать только для краткоживущей рассылки, а Redis Streams — для повторного чтения и контролируемой доставки.",
+      "evidence": "потеря Pub/Sub-сообщения, WebSocket-восстановление",
+      "reason": "доставка позднему подписчику=False; WebSocket-восстановление получило 3 события."
     },
     {
       "id": "R5",
-      "recommendation": "Saga применять только для долгих экономических операций с явными компенсациями.",
+      "recommendation": "Saga применять только для долгих игровых экономических операций с явными компенсациями.",
       "evidence": "saga",
-      "reason": "completed=1, compensated=1."
+      "reason": "завершено=1, компенсировано=1."
     },
     {
       "id": "R6",
-      "recommendation": "В мониторинг включить outbox backlog age, stream lag, duplicates, Saga duration, cache stale и error rate.",
+      "recommendation": "В мониторинг включить возраст очереди Outbox, отставание журнала, дубли, длительность Saga, устаревшее чтение кэша и долю ошибок.",
       "evidence": "/metrics/summary, evidence_trace.json",
       "reason": "без этих метрик нельзя доказательно связать отказ с архитектурной причиной."
     }

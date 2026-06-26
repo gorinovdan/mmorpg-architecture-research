@@ -1,55 +1,55 @@
 criterion,solution,score,evidence
-scalability,PostgreSQL synchronous transaction,5,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
-reliability,PostgreSQL synchronous transaction,4,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
-performance,PostgreSQL synchronous transaction,5,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
-implementation_complexity,PostgreSQL synchronous transaction,4,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
-operational_cost,PostgreSQL synchronous transaction,4,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
-observability,PostgreSQL synchronous transaction,3,"sync load=1000: p95=0.602 ms, throughput=858.67 rps"
-scalability,Transactional Outbox,5,outbox load=1000: p95=0.767 ms; pending=0
-reliability,Transactional Outbox,5,outbox load=1000: p95=0.767 ms; pending=0
-performance,Transactional Outbox,5,outbox load=1000: p95=0.767 ms; pending=0
-implementation_complexity,Transactional Outbox,3,outbox load=1000: p95=0.767 ms; pending=0
-operational_cost,Transactional Outbox,3,outbox load=1000: p95=0.767 ms; pending=0
-observability,Transactional Outbox,5,outbox load=1000: p95=0.767 ms; pending=0
-scalability,Inbox/idempotency,5,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
-reliability,Inbox/idempotency,5,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
-performance,Inbox/idempotency,5,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
-implementation_complexity,Inbox/idempotency,4,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
-operational_cost,Inbox/idempotency,5,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
-observability,Inbox/idempotency,4,"5 duplicate callback requests -> 4 duplicates, final_gold=7"
-scalability,Redis Streams,5,"stream_len=8005, replay_received=3"
-reliability,Redis Streams,5,"stream_len=8005, replay_received=3"
-performance,Redis Streams,4,"stream_len=8005, replay_received=3"
-implementation_complexity,Redis Streams,3,"stream_len=8005, replay_received=3"
-operational_cost,Redis Streams,3,"stream_len=8005, replay_received=3"
-observability,Redis Streams,5,"stream_len=8005, replay_received=3"
-scalability,Redis Pub/Sub,5,late subscriber delivered=False
-reliability,Redis Pub/Sub,2,late subscriber delivered=False
-performance,Redis Pub/Sub,5,late subscriber delivered=False
-implementation_complexity,Redis Pub/Sub,5,late subscriber delivered=False
-operational_cost,Redis Pub/Sub,4,late subscriber delivered=False
-observability,Redis Pub/Sub,2,late subscriber delivered=False
-scalability,WebSocket gateway,4,WebSocket replay received=3
-reliability,WebSocket gateway,4,WebSocket replay received=3
-performance,WebSocket gateway,4,WebSocket replay received=3
-implementation_complexity,WebSocket gateway,3,WebSocket replay received=3
-operational_cost,WebSocket gateway,3,WebSocket replay received=3
-observability,WebSocket gateway,4,WebSocket replay received=3
-scalability,Saga orchestration,3,"completed=1, compensated=1, p95=22.370 ms"
-reliability,Saga orchestration,5,"completed=1, compensated=1, p95=22.370 ms"
-performance,Saga orchestration,3,"completed=1, compensated=1, p95=22.370 ms"
-implementation_complexity,Saga orchestration,2,"completed=1, compensated=1, p95=22.370 ms"
-operational_cost,Saga orchestration,2,"completed=1, compensated=1, p95=22.370 ms"
-observability,Saga orchestration,5,"completed=1, compensated=1, p95=22.370 ms"
-scalability,Cache-aside,5,"cached=100, actual=150, stale=True"
-reliability,Cache-aside,2,"cached=100, actual=150, stale=True"
-performance,Cache-aside,5,"cached=100, actual=150, stale=True"
-implementation_complexity,Cache-aside,4,"cached=100, actual=150, stale=True"
-operational_cost,Cache-aside,4,"cached=100, actual=150, stale=True"
-observability,Cache-aside,3,"cached=100, actual=150, stale=True"
-scalability,Chat event fan-out,5,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
-reliability,Chat event fan-out,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
-performance,Chat event fan-out,5,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
-implementation_complexity,Chat event fan-out,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
-operational_cost,Chat event fan-out,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
-observability,Chat event fan-out,4,"chat load=1000: p95=0.461 ms, throughput=966.00 rps, chat_stream_len=8000"
+scalability,Синхронная транзакция PostgreSQL,4,"синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
+reliability,Синхронная транзакция PostgreSQL,4,"синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
+performance,Синхронная транзакция PostgreSQL,5,"синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
+implementation_complexity,Синхронная транзакция PostgreSQL,4,"синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
+operational_cost,Синхронная транзакция PostgreSQL,4,"синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
+observability,Синхронная транзакция PostgreSQL,3,"синхронная транзакция, нагрузка=1000: p95=1.099 мс, пропускная способность=508.99 запросов/с"
+scalability,Transactional Outbox,4,"Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
+reliability,Transactional Outbox,5,"Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
+performance,Transactional Outbox,5,"Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
+implementation_complexity,Transactional Outbox,3,"Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
+operational_cost,Transactional Outbox,3,"Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
+observability,Transactional Outbox,5,"Outbox-транзакция, нагрузка=1000: p95=1.203 мс; остаток=0"
+scalability,Inbox и идемпотентность,5,"5 повторов callback -> 4 дубля, итоговый баланс=7"
+reliability,Inbox и идемпотентность,5,"5 повторов callback -> 4 дубля, итоговый баланс=7"
+performance,Inbox и идемпотентность,5,"5 повторов callback -> 4 дубля, итоговый баланс=7"
+implementation_complexity,Inbox и идемпотентность,4,"5 повторов callback -> 4 дубля, итоговый баланс=7"
+operational_cost,Inbox и идемпотентность,5,"5 повторов callback -> 4 дубля, итоговый баланс=7"
+observability,Inbox и идемпотентность,4,"5 повторов callback -> 4 дубля, итоговый баланс=7"
+scalability,Redis Streams,5,"длина журнала=8005, повторно получено=3"
+reliability,Redis Streams,5,"длина журнала=8005, повторно получено=3"
+performance,Redis Streams,4,"длина журнала=8005, повторно получено=3"
+implementation_complexity,Redis Streams,3,"длина журнала=8005, повторно получено=3"
+operational_cost,Redis Streams,3,"длина журнала=8005, повторно получено=3"
+observability,Redis Streams,5,"длина журнала=8005, повторно получено=3"
+scalability,Redis Pub/Sub,5,доставка позднему подписчику=False
+reliability,Redis Pub/Sub,2,доставка позднему подписчику=False
+performance,Redis Pub/Sub,5,доставка позднему подписчику=False
+implementation_complexity,Redis Pub/Sub,5,доставка позднему подписчику=False
+operational_cost,Redis Pub/Sub,4,доставка позднему подписчику=False
+observability,Redis Pub/Sub,2,доставка позднему подписчику=False
+scalability,WebSocket-шлюз,4,WebSocket-восстановление: получено=3
+reliability,WebSocket-шлюз,4,WebSocket-восстановление: получено=3
+performance,WebSocket-шлюз,4,WebSocket-восстановление: получено=3
+implementation_complexity,WebSocket-шлюз,3,WebSocket-восстановление: получено=3
+operational_cost,WebSocket-шлюз,3,WebSocket-восстановление: получено=3
+observability,WebSocket-шлюз,4,WebSocket-восстановление: получено=3
+scalability,Saga-оркестрация,3,"завершено=1, компенсировано=1, p95=23.325 мс"
+reliability,Saga-оркестрация,5,"завершено=1, компенсировано=1, p95=23.325 мс"
+performance,Saga-оркестрация,3,"завершено=1, компенсировано=1, p95=23.325 мс"
+implementation_complexity,Saga-оркестрация,2,"завершено=1, компенсировано=1, p95=23.325 мс"
+operational_cost,Saga-оркестрация,2,"завершено=1, компенсировано=1, p95=23.325 мс"
+observability,Saga-оркестрация,5,"завершено=1, компенсировано=1, p95=23.325 мс"
+scalability,Cache-aside,5,"кэш=100, актуально=150, устарело=True"
+reliability,Cache-aside,2,"кэш=100, актуально=150, устарело=True"
+performance,Cache-aside,5,"кэш=100, актуально=150, устарело=True"
+implementation_complexity,Cache-aside,4,"кэш=100, актуально=150, устарело=True"
+operational_cost,Cache-aside,4,"кэш=100, актуально=150, устарело=True"
+observability,Cache-aside,3,"кэш=100, актуально=150, устарело=True"
+scalability,Чатовая рассылка,4,"чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
+reliability,Чатовая рассылка,4,"чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
+performance,Чатовая рассылка,5,"чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
+implementation_complexity,Чатовая рассылка,4,"чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
+operational_cost,Чатовая рассылка,4,"чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"
+observability,Чатовая рассылка,4,"чатовая рассылка, нагрузка=1000: p95=0.875 мс, пропускная способность=599.37 запросов/с, chat_stream_len=8000"

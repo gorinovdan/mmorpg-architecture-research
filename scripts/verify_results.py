@@ -49,7 +49,7 @@ def main(path):
     require(data["repeats"] == 5, "unexpected repeat count")
     require(len(data["performance_series"]) == 9, "aggregate performance matrix must contain 9 rows")
     require(len(data["comparison_matrix"]) >= 8, "comparison matrix is incomplete")
-    require(len(data["evidence_trace"]) >= 6, "evidence trace is incomplete")
+    require(len(data["evidence_trace"]) >= 6, "proof trace is incomplete")
     require(len(data["recommendations"]) >= 6, "recommendations are incomplete")
 
     runs = read_csv(os.path.join(base_dir, "scenario_runs.csv"))
@@ -63,7 +63,7 @@ def main(path):
     require(faults["publish_no_ack"]["transport_duplicate_observed"] is True, "publish-no-ack duplicate was not observed")
     require(faults["publish_no_ack"]["outbox_pending_after"] == 0, "outbox remained pending after publish-no-ack")
     require(faults["pubsub_loss"]["delivered_to_late_subscriber"] is False, "Pub/Sub loss scenario failed")
-    require(faults["cache_stale"]["stale"] is True, "stale cache scenario failed")
+    require(faults["cache_stale"]["stale"] is True, "cache staleness scenario failed")
     require(faults["saga"]["saga_completed"] >= 1, "completed saga was not observed")
     require(faults["saga"]["saga_compensated"] >= 1, "compensated saga was not observed")
     require(faults["websocket_replay"]["received"] >= 1, "WebSocket replay check failed")
@@ -88,7 +88,7 @@ def main(path):
         "observability",
     }, "criteria scores do not cover all criteria")
 
-    print("ok: experiment results, artifacts, evidence trace and invariants verified")
+    print("ok: experiment results, artifacts, proof trace and invariants verified")
 
 
 if __name__ == "__main__":

@@ -1,50 +1,50 @@
 [
   {
     "criterion": "Масштабируемость",
-    "scenario": "load series 100/500/1000 for sync/outbox/chat",
-    "metric": "throughput_rps_mean and error_rate_mean",
+    "scenario": "серии 100/500/1000 для синхронной транзакции, Outbox-транзакции и чатовой рассылки",
+    "metric": "средняя пропускная способность и средняя доля ошибок",
     "artifact": "scenario_runs.csv, throughput_comparison.png",
-    "result": "серии выполнены без ошибок; throughput зафиксирован для каждого класса обработки",
-    "conclusion": "горизонтально масштабируемые каналы нужны прежде всего для fan-out и worker-обработки событий"
+    "result": "серии выполнены без ошибок; пропускная способность зафиксирована для каждого класса обработки",
+    "conclusion": "масштабируемые каналы нужны прежде всего для рассылки и фоновой обработки событий"
   },
   {
     "criterion": "Надёжность",
-    "scenario": "duplicate callback, publish-no-ack, Pub/Sub loss, WebSocket replay, stale cache, Saga",
-    "metric": "duplicates_reported, redis_duplicate_events, delivered_to_late_subscriber, stale, saga_completed/compensated",
+    "scenario": "повторный callback, сбой после публикации, потеря Pub/Sub-сообщения, WebSocket-восстановление, устаревшее чтение кэша, Saga",
+    "metric": "дубли, транспортные дубли Redis, доставка позднему подписчику, признак устаревшего значения, завершение/компенсация Saga",
     "artifact": "summary.json, reliability_matrix.png",
-    "result": "duplicates=4; stream_duplicates=1; pubsub_late=False",
-    "conclusion": "надёжность достигается комбинацией Outbox, Inbox, Streams, Saga и source of truth"
+    "result": "дубли=4; дубли Redis=1; доставка позднему подписчику=False",
+    "conclusion": "надёжность достигается комбинацией Outbox, Inbox, Streams, Saga и достоверного состояния в PostgreSQL"
   },
   {
     "criterion": "Производительность",
-    "scenario": "sync/outbox/chat latency and throughput series",
-    "metric": "p50/p95/p99 latency, throughput",
+    "scenario": "серии задержки и пропускной способности для синхронной транзакции, Outbox-транзакции и чатовой рассылки",
+    "metric": "p50/p95/p99 задержки, пропускная способность",
     "artifact": "latency_comparison.png, throughput_comparison.png",
     "result": "локальные p95 и p99 измерены для каждого размера нагрузки и повторения",
-    "conclusion": "Outbox не должен трактоваться как бесплатный механизм: его overhead приемлем только при контроле backlog"
+    "conclusion": "Outbox не должен трактоваться как бесплатный механизм: его накладные расходы приемлемы только при контроле очереди"
   },
   {
     "criterion": "Сложность внедрения",
-    "scenario": "implemented components and state machines",
-    "metric": "component/state/contract count, Saga states, worker path",
+    "scenario": "реализованные компоненты и автоматы состояний",
+    "metric": "число компонентов, состояний и контрактов; состояния Saga; путь фоновой обработки",
     "artifact": "comparison_matrix.csv",
-    "result": "наибольшую сложность имеют Saga orchestration, WebSocket gateway и Outbox worker",
+    "result": "наибольшую сложность имеют Saga-оркестрация, WebSocket-шлюз и фоновый обработчик Outbox",
     "conclusion": "сложные паттерны следует применять только для сценариев, где простая транзакция не закрывает риск"
   },
   {
     "criterion": "Стоимость эксплуатации",
-    "scenario": "stateful dependencies and retained history",
-    "metric": "PostgreSQL, Redis, worker, stream length, outbox attempts",
+    "scenario": "зависимости с собственным состоянием и сохраняемая история",
+    "metric": "PostgreSQL, Redis, фоновый обработчик, длина журнала Redis Streams, попытки Outbox",
     "artifact": "comparison_matrix.csv, outbox_backlog.png",
-    "result": "stream_len=8005; outbox_attempts=8005",
-    "conclusion": "эксплуатационная стоимость определяется не только БД, но и политикой хранения stream/outbox и наблюдаемостью worker"
+    "result": "длина журнала=8005; попытки Outbox=8005",
+    "conclusion": "эксплуатационная стоимость определяется не только PostgreSQL, но и политикой хранения Redis Streams/Outbox и наблюдаемостью фоновых обработчиков"
   },
   {
     "criterion": "Наблюдаемость",
-    "scenario": "/metrics/summary and generated artifacts",
-    "metric": "outbox_oldest_pending_ms, stream length, duplicates, saga duration, cache stale",
+    "scenario": "/metrics/summary и сгенерированные артефакты",
+    "metric": "outbox_oldest_pending_ms, длина журнала, дубли, длительность Saga, устаревшее чтение кэша",
     "artifact": "summary.json, evidence_trace.json",
-    "result": "каждая итоговая рекомендация привязана к источнику метрик или fault-сценарию",
+    "result": "каждая итоговая рекомендация привязана к источнику метрик или сценарию внедрения отказа",
     "conclusion": "архитектурная рекомендация считается проверенной только при наличии наблюдаемой метрики"
   }
 ]

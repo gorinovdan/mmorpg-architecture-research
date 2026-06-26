@@ -17,6 +17,9 @@ from collections import defaultdict
 SEED = 4116
 LOAD_SIZES = [100, 500, 1000]
 REPEATS = 5
+SCENARIO_SYNC = "Синхронная транзакция"
+SCENARIO_OUTBOX = "Outbox-транзакция"
+SCENARIO_CHAT = "Чатовая рассылка"
 GRAPH_FILES = [
     "latency_comparison.png",
     "throughput_comparison.png",
@@ -50,7 +53,7 @@ def wait_health(base_url, deadline=60):
         except Exception as exc:  # pragma: no cover - diagnostic path
             last_error = exc
         time.sleep(1)
-    raise RuntimeError(f"backend is not healthy: {last_error}")
+    raise RuntimeError(f"server is not healthy: {last_error}")
 
 
 def wait_for(base_url, predicate, deadline=90):
@@ -115,7 +118,8 @@ def run_command_batch(base_url, delivery, load, repeat, player_id, amount=1, fau
             latencies.append(float(response["latency_ms"]))
         except Exception:
             errors += 1
-    result = summarize_batch(f"{delivery}_transaction", load, repeat, load, latencies, errors, started)
+    scenario = SCENARIO_OUTBOX if delivery == "outbox" else SCENARIO_SYNC
+    result = summarize_batch(scenario, load, repeat, load, latencies, errors, started)
     if delivery == "outbox":
         before = request_json("GET", f"{base_url}/metrics/summary")
         target = int(before["redis_unique_events"])
@@ -146,7 +150,7 @@ def run_chat_batch(base_url, load, repeat):
             latencies.append(float(response["latency_ms"]))
         except Exception:
             errors += 1
-    return summarize_batch("chat_fanout", load, repeat, load, latencies, errors, started)
+    return summarize_batch(SCENARIO_CHAT, load, repeat, load, latencies, errors, started)
 
 
 def run_performance_series(base_url):
@@ -287,24 +291,24 @@ def score_from_threshold(value, excellent, good, reverse=False):
 
 
 def build_comparison_matrix(aggregates, faults, final_metrics):
-    sync_p95 = best_aggregate(aggregates, "sync_transaction", "p95_ms_mean")
-    outbox_p95 = best_aggregate(aggregates, "outbox_transaction", "p95_ms_mean")
-    chat_p95 = best_aggregate(aggregates, "chat_fanout", "p95_ms_mean")
-    sync_thr = best_aggregate(aggregates, "sync_transaction", "throughput_rps_mean")
-    outbox_thr = best_aggregate(aggregates, "outbox_transaction", "throughput_rps_mean")
-    chat_thr = best_aggregate(aggregates, "chat_fanout", "throughput_rps_mean")
+    sync_p95 = best_aggregate(aggregates, SCENARIO_SYNC, "p95_ms_mean")
+    outbox_p95 = best_aggregate(aggregates, SCENARIO_OUTBOX, "p95_ms_mean")
+    chat_p95 = best_aggregate(aggregates, SCENARIO_CHAT, "p95_ms_mean")
+    sync_thr = best_aggregate(aggregates, SCENARIO_SYNC, "throughput_rps_mean")
+    outbox_thr = best_aggregate(aggregates, SCENARIO_OUTBOX, "throughput_rps_mean")
+    chat_thr = best_aggregate(aggregates, SCENARIO_CHAT, "throughput_rps_mean")
 
     rows = [
         {
-            "solution": "PostgreSQL synchronous transaction",
+            "solution": "Синхронная транзакция PostgreSQL",
             "scalability": score_from_threshold(sync_thr, 650, 350),
             "reliability": 4,
             "performance": score_from_threshold(sync_p95, 5, 15, reverse=True),
             "implementation_complexity": 4,
             "operational_cost": 4,
             "observability": 3,
-            "evidence": f"sync load=1000: p95={sync_p95:.3f} ms, throughput={sync_thr:.2f} rps",
-            "conclusion": "подходит как source of truth для критичного состояния, но не решает fan-out событий",
+            "evidence": f"синхронная транзакция, нагрузка=1000: p95={sync_p95:.3f} мс, пропускная способность={sync_thr:.2f} запросов/с",
+            "conclusion": "подходит для изменения критичного состояния, но не решает рассылку событий",
         },
         {
             "solution": "Transactional Outbox",
@@ -314,18 +318,18 @@ def build_comparison_matrix(aggregates, faults, final_metrics):
             "implementation_complexity": 3,
             "operational_cost": 3,
             "observability": 5,
-            "evidence": f"outbox load=1000: p95={outbox_p95:.3f} ms; pending={final_metrics['outbox_pending']}",
-            "conclusion": "обеспечивает восстановимую публикацию после commit при наличии worker и метрик backlog",
+            "evidence": f"Outbox-транзакция, нагрузка=1000: p95={outbox_p95:.3f} мс; pending={final_metrics['outbox_pending']}",
+            "conclusion": "обеспечивает восстановимую публикацию после фиксации транзакции при наличии фонового обработчика и метрик очереди",
         },
         {
-            "solution": "Inbox/idempotency",
+            "solution": "Inbox и идемпотентность",
             "scalability": 5,
             "reliability": 5 if faults["duplicate_callback"]["duplicates_reported"] == 4 else 2,
             "performance": 5,
             "implementation_complexity": 4,
             "operational_cost": 5,
             "observability": 4,
-            "evidence": "5 duplicate callback requests -> 4 duplicates, final_gold=7",
+            "evidence": "5 повторов callback -> 4 дубля, итоговый баланс=7",
             "conclusion": "предотвращает повторный бизнес-эффект при повторной доставке",
         },
         {
@@ -336,8 +340,8 @@ def build_comparison_matrix(aggregates, faults, final_metrics):
             "implementation_complexity": 3,
             "operational_cost": 3,
             "observability": 5,
-            "evidence": f"stream_len={final_metrics['redis_stream_len']}, replay_received={faults['websocket_replay']['received']}",
-            "conclusion": "подходит для replay и контролируемой доставки, но требует политики хранения",
+            "evidence": f"длина журнала={final_metrics['redis_stream_len']}, повторно получено={faults['websocket_replay']['received']}",
+            "conclusion": "подходит для повторного чтения и контролируемой доставки, но требует политики хранения",
         },
         {
             "solution": "Redis Pub/Sub",
@@ -347,30 +351,30 @@ def build_comparison_matrix(aggregates, faults, final_metrics):
             "implementation_complexity": 5,
             "operational_cost": 4,
             "observability": 2,
-            "evidence": f"late subscriber delivered={faults['pubsub_loss']['delivered_to_late_subscriber']}",
-            "conclusion": "пригоден для live fan-out, но не для durable-доставки критичного состояния",
+            "evidence": f"доставка позднему подписчику={faults['pubsub_loss']['delivered_to_late_subscriber']}",
+            "conclusion": "пригоден для оперативной рассылки, но не для гарантированной доставки критичного состояния",
         },
         {
-            "solution": "WebSocket gateway",
+            "solution": "WebSocket-шлюз",
             "scalability": 4,
             "reliability": 4 if faults["websocket_replay"]["received"] >= 1 else 2,
             "performance": 4,
             "implementation_complexity": 3,
             "operational_cost": 3,
             "observability": 4,
-            "evidence": f"WebSocket replay received={faults['websocket_replay']['received']}",
-            "conclusion": "нужен для realtime-доставки, но восстановление должно опираться на persisted stream",
+            "evidence": f"WebSocket-восстановление: получено={faults['websocket_replay']['received']}",
+            "conclusion": "нужен для доставки в реальном времени, но восстановление должно опираться на сохраняемый журнал",
         },
         {
-            "solution": "Saga orchestration",
+            "solution": "Saga-оркестрация",
             "scalability": 3,
             "reliability": 5 if faults["saga"]["saga_completed"] >= 1 and faults["saga"]["saga_compensated"] >= 1 else 2,
             "performance": 3,
             "implementation_complexity": 2,
             "operational_cost": 2,
             "observability": 5,
-            "evidence": f"completed={faults['saga']['saga_completed']}, compensated={faults['saga']['saga_compensated']}, p95={faults['saga']['saga_duration_p95_ms']:.3f} ms",
-            "conclusion": "подходит для долгих экономических цепочек с явными компенсациями",
+            "evidence": f"завершено={faults['saga']['saga_completed']}, компенсировано={faults['saga']['saga_compensated']}, p95={faults['saga']['saga_duration_p95_ms']:.3f} мс",
+            "conclusion": "подходит для долгих игровых экономических цепочек с явными компенсациями",
         },
         {
             "solution": "Cache-aside",
@@ -380,19 +384,19 @@ def build_comparison_matrix(aggregates, faults, final_metrics):
             "implementation_complexity": 4,
             "operational_cost": 4,
             "observability": 3,
-            "evidence": f"cached={faults['cache_stale']['cached_gold']}, actual={faults['cache_stale']['actual_gold']}, stale={faults['cache_stale']['stale']}",
-            "conclusion": "ускоряет чтение, но не может быть основанием для экономических решений",
+            "evidence": f"кэш={faults['cache_stale']['cached_gold']}, актуально={faults['cache_stale']['actual_gold']}, устарело={faults['cache_stale']['stale']}",
+            "conclusion": "ускоряет чтение, но не может быть основанием критичных игровых решений",
         },
         {
-            "solution": "Chat event fan-out",
+            "solution": "Чатовая рассылка",
             "scalability": score_from_threshold(chat_thr, 650, 350),
             "reliability": 4,
             "performance": score_from_threshold(chat_p95, 5, 15, reverse=True),
             "implementation_complexity": 4,
             "operational_cost": 4,
             "observability": 4,
-            "evidence": f"chat load=1000: p95={chat_p95:.3f} ms, throughput={chat_thr:.2f} rps, chat_stream_len={final_metrics['chat_stream_len']}",
-            "conclusion": "подходит для массовых сообщений при разделении transient Pub/Sub и stream history",
+            "evidence": f"чатовая рассылка, нагрузка=1000: p95={chat_p95:.3f} мс, пропускная способность={chat_thr:.2f} запросов/с, chat_stream_len={final_metrics['chat_stream_len']}",
+            "conclusion": "подходит для массовых сообщений при разделении Pub/Sub и сохраняемого журнала",
         },
     ]
     for row in rows:
@@ -426,50 +430,50 @@ def build_evidence_trace(aggregates, faults, matrix, final_metrics):
     return [
         {
             "criterion": "Масштабируемость",
-            "scenario": "load series 100/500/1000 for sync/outbox/chat",
-            "metric": "throughput_rps_mean and error_rate_mean",
+            "scenario": "серии 100/500/1000 для синхронной транзакции, Outbox-транзакции и чатовой рассылки",
+            "metric": "средняя пропускная способность и средняя доля ошибок",
             "artifact": "scenario_runs.csv, throughput_comparison.png",
-            "result": "серии выполнены без ошибок; throughput зафиксирован для каждого класса обработки",
-            "conclusion": "горизонтально масштабируемые каналы нужны прежде всего для fan-out и worker-обработки событий",
+            "result": "серии выполнены без ошибок; пропускная способность зафиксирована для каждого класса обработки",
+            "conclusion": "масштабируемые каналы нужны прежде всего для рассылки и фоновой обработки событий",
         },
         {
             "criterion": "Надёжность",
-            "scenario": "duplicate callback, publish-no-ack, Pub/Sub loss, WebSocket replay, stale cache, Saga",
-            "metric": "duplicates_reported, redis_duplicate_events, delivered_to_late_subscriber, stale, saga_completed/compensated",
+            "scenario": "повторный callback, сбой после публикации, потеря Pub/Sub-сообщения, WebSocket-восстановление, устаревшее чтение кэша, Saga",
+            "metric": "дубли, транспортные дубли Redis, доставка позднему подписчику, признак устаревшего значения, завершение/компенсация Saga",
             "artifact": "summary.json, reliability_matrix.png",
-            "result": f"duplicates={faults['duplicate_callback']['duplicates_reported']}; stream_duplicates={final_metrics['redis_duplicate_events']}; pubsub_late={faults['pubsub_loss']['delivered_to_late_subscriber']}",
-            "conclusion": "надёжность достигается комбинацией Outbox, Inbox, Streams, Saga и source of truth",
+            "result": f"дубли={faults['duplicate_callback']['duplicates_reported']}; дубли Redis={final_metrics['redis_duplicate_events']}; доставка позднему подписчику={faults['pubsub_loss']['delivered_to_late_subscriber']}",
+            "conclusion": "надёжность достигается комбинацией Outbox, Inbox, Streams, Saga и достоверного состояния в PostgreSQL",
         },
         {
             "criterion": "Производительность",
-            "scenario": "sync/outbox/chat latency and throughput series",
-            "metric": "p50/p95/p99 latency, throughput",
+            "scenario": "серии задержки и пропускной способности для синхронной транзакции, Outbox-транзакции и чатовой рассылки",
+            "metric": "p50/p95/p99 задержки, пропускная способность",
             "artifact": "latency_comparison.png, throughput_comparison.png",
             "result": "локальные p95 и p99 измерены для каждого размера нагрузки и повторения",
-            "conclusion": "Outbox не должен трактоваться как бесплатный механизм: его overhead приемлем только при контроле backlog",
+            "conclusion": "Outbox не должен трактоваться как бесплатный механизм: его накладные расходы приемлемы только при контроле очереди",
         },
         {
             "criterion": "Сложность внедрения",
-            "scenario": "implemented components and state machines",
-            "metric": "component/state/contract count, Saga states, worker path",
+            "scenario": "реализованные компоненты и автоматы состояний",
+            "metric": "число компонентов, состояний и контрактов; состояния Saga; путь фоновой обработки",
             "artifact": "comparison_matrix.csv",
-            "result": "наибольшую сложность имеют Saga orchestration, WebSocket gateway и Outbox worker",
+            "result": "наибольшую сложность имеют Saga-оркестрация, WebSocket-шлюз и фоновый обработчик Outbox",
             "conclusion": "сложные паттерны следует применять только для сценариев, где простая транзакция не закрывает риск",
         },
         {
             "criterion": "Стоимость эксплуатации",
-            "scenario": "stateful dependencies and retained history",
-            "metric": "PostgreSQL, Redis, worker, stream length, outbox attempts",
+            "scenario": "зависимости с собственным состоянием и сохраняемая история",
+            "metric": "PostgreSQL, Redis, фоновый обработчик, длина журнала Redis Streams, попытки Outbox",
             "artifact": "comparison_matrix.csv, outbox_backlog.png",
-            "result": f"stream_len={final_metrics['redis_stream_len']}; outbox_attempts={final_metrics['outbox_attempts_total']}",
-            "conclusion": "эксплуатационная стоимость определяется не только БД, но и политикой хранения stream/outbox и наблюдаемостью worker",
+            "result": f"длина журнала={final_metrics['redis_stream_len']}; попытки Outbox={final_metrics['outbox_attempts_total']}",
+            "conclusion": "эксплуатационная стоимость определяется не только PostgreSQL, но и политикой хранения Redis Streams/Outbox и наблюдаемостью фоновых обработчиков",
         },
         {
             "criterion": "Наблюдаемость",
-            "scenario": "/metrics/summary and generated artifacts",
-            "metric": "outbox_oldest_pending_ms, stream length, duplicates, saga duration, cache stale",
+            "scenario": "/metrics/summary и сгенерированные артефакты",
+            "metric": "outbox_oldest_pending_ms, длина журнала, дубли, длительность Saga, устаревшее чтение кэша",
             "artifact": "summary.json, evidence_trace.json",
-            "result": "каждая итоговая рекомендация привязана к источнику метрик или fault-сценарию",
+            "result": "каждая итоговая рекомендация привязана к источнику метрик или сценарию внедрения отказа",
             "conclusion": "архитектурная рекомендация считается проверенной только при наличии наблюдаемой метрики",
         },
     ]
@@ -479,37 +483,37 @@ def build_recommendations(faults, final_metrics):
     return [
         {
             "id": "R1",
-            "recommendation": "PostgreSQL использовать как source of truth для экономики, инвентаря, прогресса и аудита.",
-            "evidence": "sync_transaction series, cache_stale",
-            "reason": f"cache stale reproduced: cached={faults['cache_stale']['cached_gold']}, actual={faults['cache_stale']['actual_gold']}",
+            "recommendation": "Хранить достоверное состояние игровой экономики, инвентаря игрока, прогресса игрока и аудита игровых операций в PostgreSQL.",
+            "evidence": "серии синхронных транзакций, устаревшее чтение кэша",
+            "reason": f"воспроизведено устаревшее чтение кэша: кэш={faults['cache_stale']['cached_gold']}, актуально={faults['cache_stale']['actual_gold']}",
         },
         {
             "id": "R2",
             "recommendation": "Каждую внешнюю команду и callback снабжать idempotency key и фиксировать в Inbox.",
-            "evidence": "duplicate_callback",
+            "evidence": "повторный callback",
             "reason": "5 повторов одной команды дали один бизнес-результат и 4 зарегистрированных дубля.",
         },
         {
             "id": "R3",
             "recommendation": "Исходящие доменные события публиковать через Transactional Outbox и идемпотентных потребителей.",
-            "evidence": "publish_no_ack, outbox_delivery series",
-            "reason": f"publish-no-ack created duplicate transport event; final outbox_pending={final_metrics['outbox_pending']}.",
+            "evidence": "сбой после публикации, серия Outbox-доставки",
+            "reason": f"сбой после публикации создал транспортный дубль; финальное значение outbox_pending={final_metrics['outbox_pending']}.",
         },
         {
             "id": "R4",
-            "recommendation": "Redis Pub/Sub использовать только для transient fan-out, а Redis Streams — для replay и контролируемой доставки.",
-            "evidence": "pubsub_loss, websocket_replay",
-            "reason": f"late subscriber delivered={faults['pubsub_loss']['delivered_to_late_subscriber']}; ws replay received={faults['websocket_replay']['received']}.",
+            "recommendation": "Redis Pub/Sub использовать только для краткоживущей рассылки, а Redis Streams — для повторного чтения и контролируемой доставки.",
+            "evidence": "потеря Pub/Sub-сообщения, WebSocket-восстановление",
+            "reason": f"доставка позднему подписчику={faults['pubsub_loss']['delivered_to_late_subscriber']}; WebSocket-восстановление получило {faults['websocket_replay']['received']} события.",
         },
         {
             "id": "R5",
-            "recommendation": "Saga применять только для долгих экономических операций с явными компенсациями.",
+            "recommendation": "Saga применять только для долгих игровых экономических операций с явными компенсациями.",
             "evidence": "saga",
-            "reason": f"completed={faults['saga']['saga_completed']}, compensated={faults['saga']['saga_compensated']}.",
+            "reason": f"завершено={faults['saga']['saga_completed']}, компенсировано={faults['saga']['saga_compensated']}.",
         },
         {
             "id": "R6",
-            "recommendation": "В мониторинг включить outbox backlog age, stream lag, duplicates, Saga duration, cache stale и error rate.",
+            "recommendation": "В мониторинг включить возраст очереди Outbox, отставание журнала, дубли, длительность Saga, устаревшее чтение кэша и долю ошибок.",
             "evidence": "/metrics/summary, evidence_trace.json",
             "reason": "без этих метрик нельзя доказательно связать отказ с архитектурной причиной.",
         },
@@ -570,11 +574,11 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
     plt.rcParams.update({
         "font.family": "serif",
         "font.serif": ["Times New Roman", "DejaVu Serif", "Liberation Serif"],
-        "axes.titlesize": 13,
-        "axes.labelsize": 10,
-        "xtick.labelsize": 9,
-        "ytick.labelsize": 9,
-        "legend.fontsize": 8,
+        "axes.titlesize": 14,
+        "axes.labelsize": 12,
+        "xtick.labelsize": 11,
+        "ytick.labelsize": 11,
+        "legend.fontsize": 12,
         "figure.facecolor": "white",
         "axes.facecolor": "white",
         "axes.edgecolor": "#222222",
@@ -598,15 +602,10 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
         "border": "#c9d1d9",
     }
 
-    scenario_names = {
-        "chat_fanout": "чат fan-out",
-        "outbox_transaction": "Outbox-транзакция",
-        "sync_transaction": "синхронная транзакция",
-    }
     scenario_styles = {
-        "chat_fanout": {"color": palette["amber"], "marker": "o", "linestyle": "-"},
-        "outbox_transaction": {"color": palette["teal"], "marker": "s", "linestyle": "--"},
-        "sync_transaction": {"color": palette["blue"], "marker": "^", "linestyle": "-."},
+        SCENARIO_CHAT: {"color": palette["amber"], "marker": "o", "linestyle": "-"},
+        SCENARIO_OUTBOX: {"color": palette["teal"], "marker": "s", "linestyle": "--"},
+        SCENARIO_SYNC: {"color": palette["blue"], "marker": "^", "linestyle": "-."},
     }
 
     def wrapped(text, width):
@@ -635,16 +634,16 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
         ax.plot(
             [row["load"] for row in rows],
             [row["p95_ms_mean"] for row in rows],
-            linewidth=1.8,
-            markersize=5,
+            linewidth=2.4,
+            markersize=6.5,
             **scenario_styles.get(scenario, {"color": "#111111", "marker": "o", "linestyle": "-"}),
-            label=scenario_names.get(scenario, scenario),
+            label=scenario,
         )
     ax.set_title("Задержка p95 по сценариям и размеру нагрузки")
     ax.set_xlabel("команд/сообщений в серии")
     ax.set_ylabel("p95, мс")
     ax.grid(alpha=0.75, color=palette["grid"], linewidth=0.7)
-    ax.legend(frameon=False)
+    ax.legend(frameon=False, loc="best")
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "latency_comparison.png"), dpi=160)
     plt.close(fig)
@@ -655,16 +654,16 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
         ax.plot(
             [row["load"] for row in rows],
             [row["throughput_rps_mean"] for row in rows],
-            linewidth=1.8,
-            markersize=5,
+            linewidth=2.4,
+            markersize=6.5,
             **scenario_styles.get(scenario, {"color": "#111111", "marker": "o", "linestyle": "-"}),
-            label=scenario_names.get(scenario, scenario),
+            label=scenario,
         )
     ax.set_title("Пропускная способность по сценариям и размеру нагрузки")
     ax.set_xlabel("команд/сообщений в серии")
     ax.set_ylabel("запросов/с")
     ax.grid(alpha=0.75, color=palette["grid"], linewidth=0.7)
-    ax.legend(frameon=False)
+    ax.legend(frameon=False, loc="best")
     fig.tight_layout()
     fig.savefig(os.path.join(out_dir, "throughput_comparison.png"), dpi=160)
     plt.close(fig)
@@ -683,26 +682,26 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
             "color": palette["amber"],
         },
         {
-            "title": "Pub/Sub late subscriber",
+            "title": "Потеря Pub/Sub-сообщения",
             "metric": f"доставка позднему подписчику={faults['pubsub_loss']['delivered_to_late_subscriber']}",
-            "result": "история не хранится, нужен persisted stream",
+            "result": "история не хранится, нужен сохраняемый журнал",
             "color": palette["red"],
         },
         {
-            "title": "WebSocket replay",
-            "metric": f"получено после reconnect={faults['websocket_replay']['received']}",
+            "title": "WebSocket-восстановление",
+            "metric": f"получено после подключения={faults['websocket_replay']['received']}",
             "result": "восстановление требует last-seen marker",
             "color": palette["blue"],
         },
         {
-            "title": "Cache-aside stale",
-            "metric": f"кэш={faults['cache_stale']['cached_gold']}; БД={faults['cache_stale']['actual_gold']}",
-            "result": "кэш не является источником истины для экономики",
+            "title": "Устаревшее чтение кэша",
+            "metric": f"кэш={faults['cache_stale']['cached_gold']}; PostgreSQL={faults['cache_stale']['actual_gold']}",
+            "result": "кэш не используется для критичных игровых решений",
             "color": palette["amber"],
         },
         {
-            "title": "Saga outcomes",
-            "metric": f"completed={faults['saga']['saga_completed']}; compensated={faults['saga']['saga_compensated']}",
+            "title": "Исходы Saga",
+            "metric": f"завершено={faults['saga']['saga_completed']}; компенсировано={faults['saga']['saga_compensated']}",
             "result": "оба исхода наблюдаемы и проверяемы",
             "color": palette["green"],
         },
@@ -800,7 +799,7 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
     ax.text(
         0.5,
         max(actual, cached) * 1.24,
-        "Вывод: кэш ускоряет чтение, но не является источником истины для экономики",
+        "Вывод: кэш ускоряет чтение, но не используется для критичных игровых решений",
         ha="center",
         va="center",
         fontsize=9,
@@ -844,11 +843,11 @@ def plot_artifacts(out_dir, aggregates, matrix, faults, final_metrics):
         ("observability", "Наблюда-\nемость"),
     ]
     selected = [
-        ("Inbox/idempotency", "Inbox/idempotency", palette["green"]),
+        ("Inbox и идемпотентность", "Inbox и\nидемпотентность", palette["green"]),
         ("Transactional Outbox", "Transactional Outbox", palette["teal"]),
         ("Redis Streams", "Redis Streams", palette["blue"]),
         ("Redis Pub/Sub", "Redis Pub/Sub", palette["amber"]),
-        ("Saga orchestration", "Saga orchestration", palette["red"]),
+        ("Saga-оркестрация", "Saga-\nоркестрация", palette["red"]),
         ("Cache-aside", "Cache-aside", palette["purple"]),
     ]
     by_solution = {row["solution"]: row for row in matrix}

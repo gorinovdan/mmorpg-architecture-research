@@ -1,37 +1,37 @@
 [
   {
     "id": "R1",
-    "recommendation": "PostgreSQL использовать как source of truth для экономики, инвентаря, прогресса и аудита.",
-    "evidence": "sync_transaction series, cache_stale",
-    "reason": "cache stale reproduced: cached=100, actual=150"
+    "recommendation": "Хранить достоверное состояние игровой экономики, инвентаря игрока, прогресса игрока и аудита игровых операций в PostgreSQL.",
+    "evidence": "серии синхронных транзакций, устаревшее чтение кэша",
+    "reason": "воспроизведено устаревшее чтение кэша: кэш=100, актуально=150"
   },
   {
     "id": "R2",
     "recommendation": "Каждую внешнюю команду и callback снабжать idempotency key и фиксировать в Inbox.",
-    "evidence": "duplicate_callback",
+    "evidence": "повторный callback",
     "reason": "5 повторов одной команды дали один бизнес-результат и 4 зарегистрированных дубля."
   },
   {
     "id": "R3",
     "recommendation": "Исходящие доменные события публиковать через Transactional Outbox и идемпотентных потребителей.",
-    "evidence": "publish_no_ack, outbox_delivery series",
-    "reason": "publish-no-ack created duplicate transport event; final outbox_pending=0."
+    "evidence": "сбой после публикации, серия Outbox-доставки",
+    "reason": "сбой после публикации создал транспортный дубль; финальное значение outbox_остаток=0."
   },
   {
     "id": "R4",
-    "recommendation": "Redis Pub/Sub использовать только для transient fan-out, а Redis Streams — для replay и контролируемой доставки.",
-    "evidence": "pubsub_loss, websocket_replay",
-    "reason": "late subscriber delivered=False; ws replay received=3."
+    "recommendation": "Redis Pub/Sub использовать только для краткоживущей рассылки, а Redis Streams — для повторного чтения и контролируемой доставки.",
+    "evidence": "потеря Pub/Sub-сообщения, WebSocket-восстановление",
+    "reason": "доставка позднему подписчику=False; WebSocket-восстановление получило 3 события."
   },
   {
     "id": "R5",
-    "recommendation": "Saga применять только для долгих экономических операций с явными компенсациями.",
+    "recommendation": "Saga применять только для долгих игровых экономических операций с явными компенсациями.",
     "evidence": "saga",
-    "reason": "completed=1, compensated=1."
+    "reason": "завершено=1, компенсировано=1."
   },
   {
     "id": "R6",
-    "recommendation": "В мониторинг включить outbox backlog age, stream lag, duplicates, Saga duration, cache stale и error rate.",
+    "recommendation": "В мониторинг включить возраст очереди Outbox, отставание журнала, дубли, длительность Saga, устаревшее чтение кэша и долю ошибок.",
     "evidence": "/metrics/summary, evidence_trace.json",
     "reason": "без этих метрик нельзя доказательно связать отказ с архитектурной причиной."
   }

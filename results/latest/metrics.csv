@@ -1,6 +1,6 @@
 scenario,metric,value,unit
 seed,seed,4116,count
-started_at,started_at,2026-06-21T15:32:55Z,text
+started_at,started_at,2026-06-26T15:56:58Z,text
 repeats,repeats,5,count
 fault_scenarios.duplicate_callback,requests,5,count
 fault_scenarios.duplicate_callback,duplicates_reported,4,count
@@ -17,8 +17,8 @@ fault_scenarios.cache_stale,cached_gold,100,count
 fault_scenarios.cache_stale,stale,True,bool
 fault_scenarios.saga,saga_completed,1,count
 fault_scenarios.saga,saga_compensated,1,count
-fault_scenarios.saga,saga_duration_avg_ms,19.8945,ms
-fault_scenarios.saga,saga_duration_p95_ms,22.36995,ms
+fault_scenarios.saga,saga_duration_avg_ms,22.0655,ms
+fault_scenarios.saga,saga_duration_p95_ms,23.32505,ms
 fault_scenarios.websocket_replay,received,3,count
 final_metrics,chat_messages,8000,count
 final_metrics,chat_stream_len,8000,count
@@ -33,6 +33,6 @@ final_metrics,redis_stream_len,8005,count
 final_metrics,redis_unique_events,8004,count
 final_metrics,saga_compensated,1,count
 final_metrics,saga_completed,1,count
-final_metrics,saga_duration_avg_ms,19.8945,ms
-final_metrics,saga_duration_p95_ms,22.36995,ms
+final_metrics,saga_duration_avg_ms,22.0655,ms
+final_metrics,saga_duration_p95_ms,23.32505,ms
 final_metrics,transport_duplicate_observed,True,bool
